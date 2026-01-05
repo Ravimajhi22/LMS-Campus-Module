@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,43 +34,91 @@ public class TransportController {
 
     // ================= BUS =================//
 
+    
     @PostMapping("/bus")
     public ResponseEntity<?> addBus(HttpServletRequest request,
                                     @RequestBody Bus bus) {
 
-        List<String> permissions =
-                (List<String>) request.getAttribute("permissions");
-
-        if (!permissions.contains("BUS_CREATE")) {
-            return ResponseEntity.status(403).body("Access Denied");
+        if (!hasPermission(request, "BUS_CREATE")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: BUS_CREATE permission required");
         }
 
         return ResponseEntity.ok(transportService.addBus(bus));
     }
+    private boolean hasPermission(HttpServletRequest request, String permission) {
+        List<String> permissions =
+                (List<String>) request.getAttribute("permissions");
+
+        return permissions != null && permissions.contains(permission);
+    }
 
 
     @GetMapping("/buses")
-    public ResponseEntity<List<Bus>> getAllBuses() {
+    public ResponseEntity<?> getAllBuses(HttpServletRequest request) {
+
+        if (!hasPermission(request, "BUS_VIEW")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: BUS_VIEW permission required");
+        }
+
         return ResponseEntity.ok(transportService.getAllBuses());
     }
 
-    @PutMapping("/bus/{busId}")
-    public ResponseEntity<Bus> updateBus(@PathVariable Long busId, @RequestBody Bus bus) {
+
+	@PutMapping("/bus/{busId}")
+    public ResponseEntity<?> updateBus(
+            HttpServletRequest request,
+            @PathVariable Long busId,
+            @RequestBody Bus bus) {
+
+        if (!hasPermission(request, "BUS_UPDATE")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: BUS_UPDATE permission required");
+        }
+
         return ResponseEntity.ok(transportService.updateBus(busId, bus));
     }
 
+
     @DeleteMapping("/bus/{busId}")
-    public ResponseEntity<String> deleteBus(@PathVariable Long busId) {
+    public ResponseEntity<?> deleteBus(
+            HttpServletRequest request,
+            @PathVariable Long busId) {
+
+        if (!hasPermission(request, "BUS_DELETE")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: BUS_DELETE permission required");
+        }
+
         transportService.deleteBus(busId);
         return ResponseEntity.ok("Bus deleted successfully");
     }
+    
     @PatchMapping("/bus/{busId}")
-    public ResponseEntity<Bus> patchBus(@PathVariable Long busId, @RequestBody Map<String,Object> updates) {
+    public ResponseEntity<?> patchBus(
+            HttpServletRequest request,
+            @PathVariable Long busId,
+            @RequestBody Map<String, Object> updates) {
+
+        if (!hasPermission(request, "BUS_UPDATE")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: BUS_UPDATE permission required");
+        }
+
         Bus bus = new Bus();
-        if(updates.containsKey("busNumber")) bus.setBusNumber((String) updates.get("busNumber"));
-        if(updates.containsKey("driverName")) bus.setDriverName((String) updates.get("driverName"));
-        if(updates.containsKey("driverContact")) bus.setDriverContact((String) updates.get("driverContact"));
-        if(updates.containsKey("capacity")) bus.setCapacity((Integer) updates.get("capacity"));
+
+        if (updates.containsKey("busNumber"))
+            bus.setBusNumber((String) updates.get("busNumber"));
+
+        if (updates.containsKey("driverName"))
+            bus.setDriverName((String) updates.get("driverName"));
+
+        if (updates.containsKey("driverContact"))
+            bus.setDriverContact((String) updates.get("driverContact"));
+
+        if (updates.containsKey("capacity"))
+            bus.setCapacity((Integer) updates.get("capacity"));
 
         return ResponseEntity.ok(transportService.patchBus(busId, bus));
     }

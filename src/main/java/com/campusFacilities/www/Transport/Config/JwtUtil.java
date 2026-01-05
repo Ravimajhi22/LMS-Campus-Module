@@ -14,7 +14,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
 	
 	    private static final String SECRET_KEY =
-	            "my-super-secure-jwt-secret-key-my-super-secure";
+	            "lms_prod_jwt_secret_change_this_very_long_random_string_987654321";
 
 	    private SecretKey getSigningKey() {
 	        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

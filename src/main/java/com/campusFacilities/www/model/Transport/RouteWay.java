@@ -2,6 +2,8 @@ package com.campusFacilities.www.model.Transport;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RouteWay {
 
-    @Id
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_id")
     private Long routeId;
 
