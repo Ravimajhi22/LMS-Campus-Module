@@ -13,11 +13,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -39,7 +39,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(jwtSecret.getBytes())
+                        .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                         .build()
                         .parseClaimsJws(token)
                         .getBody();
@@ -48,7 +48,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 List<String> permissions = claims.get("permissions", List.class);
 
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-
 
                 if (roles != null) {
                     roles.forEach(role ->

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -12,51 +13,46 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
-	
-	    private static final String SECRET_KEY =
-	            "lms_prod_jwt_secret_change_this_very_long_random_string_987654321";
 
-	    private SecretKey getSigningKey() {
-	        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-	    }
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-	    private Claims extractAllClaims(String token) {
-	        return Jwts.parserBuilder()
-	                .setSigningKey(getSigningKey())
-	                .build()
-	                .parseClaimsJws(token)
-	                .getBody();
-	    }
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
 
-	    public boolean isTokenValid(String token) {
-	        try {
-	            extractAllClaims(token);
-	            return true;
-	        } catch (Exception e) {
-	            return false;
-	        }
-	    }
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 
-	    public Long extractUserId(String token) {
-	        Claims claims = extractAllClaims(token);
-	        return claims.get("userId", Long.class);
-	    }
+    public boolean isTokenValid(String token) {
+        try {
+            extractAllClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-	    @SuppressWarnings("unchecked")
-	    public List<String> extractRoles(String token) {
-	        Claims claims = extractAllClaims(token);
-	        return (List<String>) claims.get("roles");
-	    }
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("userId", Long.class);
+    }
 
-	    @SuppressWarnings("unchecked")
-	    public List<String> extractPermissions(String token) {
-	        Claims claims = extractAllClaims(token);
-	        return (List<String>) claims.get("permissions");
-	    }
+    @SuppressWarnings("unchecked")
+    public List<String> extractRoles(String token) {
+        return extractAllClaims(token).get("roles", List.class);
+    }
 
-	    public String extractUsername(String token) {
-	        return extractAllClaims(token).getSubject();
-	    }
-	}
+    @SuppressWarnings("unchecked")
+    public List<String> extractPermissions(String token) {
+        return extractAllClaims(token).get("permissions", List.class);
+    }
 
-
+    public String extractUsername(String token) {
+        return extractAllClaims(token).getSubject();
+    }
+}
