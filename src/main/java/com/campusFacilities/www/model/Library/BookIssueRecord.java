@@ -47,6 +47,11 @@ public class BookIssueRecord {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     public enum Status { ISSUED, RETURNED, OVERDUE }
-
+   
+    @Data
+    public static class IssueRequest {
+        private Long bookId;
+        private Long memberId;
+    }
     
 }

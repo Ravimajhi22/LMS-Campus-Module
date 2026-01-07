@@ -1,7 +1,6 @@
 package com.campusFacilities.www.controller;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,14 +13,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.campusFacilities.www.model.Transport.Bus;
 import com.campusFacilities.www.model.Transport.BusPass;
 import com.campusFacilities.www.model.Transport.BusRoute;
 import com.campusFacilities.www.model.Transport.RouteWay;
 import com.campusFacilities.www.model.Transport.Stop;
 import com.campusFacilities.www.service.Imp.TransportService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -140,8 +137,6 @@ public class TransportController {
 
         return ResponseEntity.ok(transportService.patchRoute(routeId, route));
     }
-
-
 
     // ================= STOP =================//
 

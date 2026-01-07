@@ -2,6 +2,7 @@ package com.campusFacilities.www.service.Imp;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import com.campusFacilities.www.model.Library.Books;
 import com.campusFacilities.www.model.Library.LibraryFine;
 import com.campusFacilities.www.model.Library.LibraryMember;
 import com.campusFacilities.www.model.Library.LibrarySettings;
-
 import com.campusFacilities.www.repository.Library.BookCategoryRepository;
 import com.campusFacilities.www.repository.Library.BookIssueRecordRepository;
 import com.campusFacilities.www.repository.Library.BookReservationRepository;
@@ -57,6 +57,7 @@ public class LibraryServiceImpl {
     public List<Books> getAllBooks() {
         return booksRepository.findAll();
     }
+    
 
     public Books updateBook(Long bookId, Books updatedBook) {
 
@@ -84,6 +85,7 @@ public class LibraryServiceImpl {
 
         booksRepository.delete(book);
     }
+    
 
     // ================= BOOK CATEGORY =================
 
@@ -118,9 +120,22 @@ public class LibraryServiceImpl {
         category.setIsDeleted(true);
         bookCategoryRepository.save(category);
     }
+  
+    public BookCategory patchCategory(Long categoryId, Map<String, Object> updates) {
+        BookCategory category = bookCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+
+        if (updates.containsKey("categoryName"))
+            category.setCategoryName((String) updates.get("categoryName"));
+        if (updates.containsKey("description"))
+            category.setDescription((String) updates.get("description"));
+
+        return bookCategoryRepository.save(category);
+    }
 
     // ================= ISSUE BOOK =================
 
+ 
     public BookIssueRecord issueBook(Long bookId, Long memberId) {
 
         Books book = booksRepository.findById(bookId)
@@ -145,11 +160,28 @@ public class LibraryServiceImpl {
 
         return issueRepository.save(issue);
     }
+    
+    public List<BookIssueRecord> getAllIssueRecords() {
+        return issueRepository.findAll();
+    }
+
 
     public void deleteIssueRecord(Long id) {
         issueRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Issue record not found with id: " + id));
+    }
+   
+    public BookIssueRecord patchIssueRecord(Long issueId, Map<String, Object> updates) {
+        BookIssueRecord issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new RuntimeException("Issue record not found with id: " + issueId));
+
+        if (updates.containsKey("status"))
+            issue.setStatus(BookIssueRecord.Status.valueOf((String) updates.get("status")));
+        if (updates.containsKey("dueDate"))
+            issue.setDueDate(LocalDate.parse((String) updates.get("dueDate")));
+
+        return issueRepository.save(issue);
     }
 
     // ================= BOOK RESERVATION =================
@@ -186,6 +218,16 @@ public class LibraryServiceImpl {
         reservation.setIsDeleted(true);
         bookReservationRepository.save(reservation);
     }
+    public BookReservation patchReservation(Long reservationId, Map<String, Object> updates) {
+        BookReservation reservation = bookReservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + reservationId));
+
+        if (updates.containsKey("reservationDate"))
+            reservation.setReservationDate(LocalDate.parse((String) updates.get("reservationDate")));
+
+        return bookReservationRepository.save(reservation);
+    }
+
 
     // ================= FINES =================
 
@@ -219,7 +261,18 @@ public class LibraryServiceImpl {
         fine.setIsDeleted(true);
         libraryFineRepository.save(fine);
     }
+    public LibraryFine patchFine(Long fineId, Map<String, Object> updates) {
+        LibraryFine fine = libraryFineRepository.findById(fineId)
+                .orElseThrow(() -> new RuntimeException("Fine not found with id: " + fineId));
 
+        if (updates.containsKey("fineAmount"))
+            fine.setFineAmount((Double) updates.get("fineAmount"));
+        if (updates.containsKey("paidStatus"))
+            fine.setPaidStatus(LibraryFine.Status.valueOf((String) updates.get("paidStatus")));
+
+        return libraryFineRepository.save(fine);
+    }
+    
     // ================= RETURN BOOK =================
 
     public BookIssueRecord returnBook(Long issueId) {
@@ -273,7 +326,20 @@ public class LibraryServiceImpl {
         member.setIsDeleted(true);
         memberRepository.save(member);
     }
+    public LibraryMember patchMember(Long memberId, Map<String, Object> updates) {
+        LibraryMember member = getMemberById(memberId);
 
+        if (updates.containsKey("userId"))
+            member.setUserId((Long) updates.get("userId"));
+        if (updates.containsKey("memberType"))
+            member.setMemberType((String) updates.get("memberType"));
+        if (updates.containsKey("maxBooksAllowed"))
+            member.setMaxBooksAllowed((Integer) updates.get("maxBooksAllowed"));
+        if (updates.containsKey("status"))
+            member.setStatus((String) updates.get("status"));
+
+        return memberRepository.save(member);
+    }
     // ================= SETTINGS =================
 
     public LibrarySettings addSettings(LibrarySettings settings) {
@@ -303,4 +369,5 @@ public class LibraryServiceImpl {
         settings.setIsDeleted(true);
         librarySettingsRepository.save(settings);
     }
+    
 }
