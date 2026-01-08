@@ -71,6 +71,29 @@ public class HostelServiceImpl {
         hostel.setIsDeleted(true);
         hostelRepository.save(hostel);
     }
+   
+    public Hostel patchHostel(Long hostelId, Hostel hostel) {
+        Hostel existing = hostelRepository.findById(hostelId)
+                .orElseThrow(() -> new RuntimeException("Hostel not found with id: " + hostelId));
+
+        if (hostel.getHostelName() != null)
+            existing.setHostelName(hostel.getHostelName());
+
+        if (hostel.getHostelType() != null)
+            existing.setHostelType(hostel.getHostelType());
+
+        if (hostel.getWardenName() != null)
+            existing.setWardenName(hostel.getWardenName());
+
+        if (hostel.getContactNumber() != null)
+            existing.setContactNumber(hostel.getContactNumber());
+
+        if (hostel.getStatus() != null)
+            existing.setStatus(hostel.getStatus());
+
+        return hostelRepository.save(existing);
+    }
+
 
     // ================= HostelBlocks =================
 
@@ -99,6 +122,22 @@ public class HostelServiceImpl {
 
         block.setStatus(HostelBlock.Status.INACTIVE);
         blockRepository.save(block);
+    }
+
+    public HostelBlock patchBlock(Long blockId, HostelBlock block) {
+        HostelBlock existing = blockRepository.findById(blockId)
+                .orElseThrow(() -> new RuntimeException("Block not found with id: " + blockId));
+
+        if (block.getBlockName() != null)
+            existing.setBlockName(block.getBlockName());
+
+        if (block.getTotalFloors() != null)
+            existing.setTotalFloors(block.getTotalFloors());
+
+        if (block.getStatus() != null)
+            existing.setStatus(block.getStatus());
+
+        return blockRepository.save(existing);
     }
 
     // ================= HostelRooms=================
@@ -132,6 +171,28 @@ public class HostelServiceImpl {
 
         room.setStatus(HostelRoom.RoomStatus.MAINTENANCE);
         roomRepository.save(room);
+    }
+    
+    public HostelRoom patchRoom(Long roomId, HostelRoom room) {
+        HostelRoom existing = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
+
+        if (room.getRoomNumber() != null)
+            existing.setRoomNumber(room.getRoomNumber());
+
+        if (room.getFloorNumber() != null)
+            existing.setFloorNumber(room.getFloorNumber());
+
+        if (room.getCapacity() != null)
+            existing.setCapacity(room.getCapacity());
+
+        if (room.getRoomType() != null)
+            existing.setRoomType(room.getRoomType());
+
+        if (room.getStatus() != null)
+            existing.setStatus(room.getStatus());
+
+        return roomRepository.save(existing);
     }
 
     // ================= Rooms Allocation=================
@@ -167,6 +228,27 @@ public class HostelServiceImpl {
         allocation.setStatus(StudentHostelAllocation.AllocationStatus.CANCELLED);
         allocationRepository.save(allocation);
     }
+    public StudentHostelAllocation patchAllocation(Long allocationId, StudentHostelAllocation allocation) {
+        StudentHostelAllocation existing = allocationRepository.findById(allocationId)
+                .orElseThrow(() -> new RuntimeException("Allocation not found with id: " + allocationId));
+
+        if (allocation.getRoom() != null && allocation.getRoom().getRoomId() != null) {
+            HostelRoom room = roomRepository.findById(allocation.getRoom().getRoomId())
+                    .orElseThrow(() -> new RuntimeException("Room not found"));
+            existing.setRoom(room);
+        }
+
+        if (allocation.getJoinDate() != null)
+            existing.setJoinDate(allocation.getJoinDate());
+
+        if (allocation.getLeaveDate() != null)
+            existing.setLeaveDate(allocation.getLeaveDate());
+
+        if (allocation.getStatus() != null)
+            existing.setStatus(allocation.getStatus());
+
+        return allocationRepository.save(existing);
+    }
 
     // ================= Hostel Fees=================
 
@@ -197,6 +279,25 @@ public class HostelServiceImpl {
 
         fee.setStatus(HostelFee.Status.INACTIVE);
         feeRepository.save(fee);
+    }
+
+    public HostelFee patchFee(Long feeId, HostelFee fee) {
+        HostelFee existing = feeRepository.findById(feeId)
+                .orElseThrow(() -> new RuntimeException("Fee not found with id: " + feeId));
+
+        if (fee.getRoomType() != null)
+            existing.setRoomType(fee.getRoomType());
+
+        if (fee.getAmount() != null)
+            existing.setAmount(fee.getAmount());
+
+        if (fee.getEffectiveFrom() != null)
+            existing.setEffectiveFrom(fee.getEffectiveFrom());
+
+        if (fee.getStatus() != null)
+            existing.setStatus(fee.getStatus());
+
+        return feeRepository.save(existing);
     }
 
     // ================= Hostel complaints =================
@@ -242,4 +343,28 @@ public class HostelServiceImpl {
         complaint.setStatus(HostelComplaint.ComplaintStatus.RESOLVED);
         complaintRepository.save(complaint);
     }
-}
+        
+        public HostelComplaint patchComplaint(Long complaintId, HostelComplaint complaint) {
+            HostelComplaint existing = complaintRepository.findById(complaintId)
+                    .orElseThrow(() -> new RuntimeException("Complaint not found with id: " + complaintId));
+
+            if (complaint.getRoom() != null && complaint.getRoom().getRoomId() != null) {
+                HostelRoom room = roomRepository.findById(complaint.getRoom().getRoomId())
+                        .orElseThrow(() -> new RuntimeException("Room not found"));
+                existing.setRoom(room);
+            }
+
+            if (complaint.getComplaintType() != null)
+                existing.setComplaintType(complaint.getComplaintType());
+
+            if (complaint.getDescription() != null)
+                existing.setDescription(complaint.getDescription());
+
+            if (complaint.getStatus() != null)
+                existing.setStatus(complaint.getStatus());
+
+            return complaintRepository.save(existing);
+        }
+ 
+    }
+

@@ -43,5 +43,10 @@ public class DocumentAccessLog {
     public enum Action {
         VIEW, DOWNLOAD, DELETE
     }
+
+	public void setUserId(Long userId) {
+		
+		
+	}
 }
 

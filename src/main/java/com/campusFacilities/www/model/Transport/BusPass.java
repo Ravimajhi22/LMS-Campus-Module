@@ -26,7 +26,7 @@ public class BusPass {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long passId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "Student_id", nullable = false)
     private Long userId;
 
     @Column(name = "issue_date")

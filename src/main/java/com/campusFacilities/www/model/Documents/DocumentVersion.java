@@ -35,12 +35,6 @@ public class DocumentVersion {
     private String filePath;
     private Long fileSize;
 
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "uploaded_by", nullable = false) private User uploadedBy;
-	 */
-    
     @CreationTimestamp
     private LocalDateTime createdAt;
 }

@@ -1,143 +1,218 @@
 package com.campusFacilities.www.controller;
-
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.campusFacilities.www.Transport.Config.JwtUtil;
 import com.campusFacilities.www.model.Documents.Document;
 import com.campusFacilities.www.model.Documents.DocumentAccessLog;
 import com.campusFacilities.www.model.Documents.DocumentCategory;
 import com.campusFacilities.www.model.Documents.DocumentShare;
 import com.campusFacilities.www.model.Documents.DocumentVersion;
-import com.campusFacilities.www.model.Documents.User;
 import com.campusFacilities.www.service.Imp.DocumentServiceImpl;
-@RestController
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+
+    @RestController
 	@RequestMapping("/documents")
-	
+    @RequiredArgsConstructor
 	public class DocumentController {
 	   
-	@Autowired
-	private DocumentServiceImpl service;
+	 @Autowired
+	 private DocumentServiceImpl service;
+
+	  @Autowired
+	  private JwtUtil jwtUtil;
 
 	  
-	    /* ==========================
-	                DOCUMENT 
-	       ========================== */
+	//========================== DOCUMENT ========================== //
 
-	    @PostMapping
-	    public Document uploadDocument(@RequestBody Document document) {
-	        return service.uploadDocument(document);
-	    }
+			@PostMapping
+			public Document uploadDocument(@RequestBody Document document, HttpServletRequest request) {
+			Long userId = extractUserIdFromToken(request);
+        	document.setUploadedBy(userId);
+        	document.setOwnerUserId(userId);
+        	return service.uploadDocument(document);
+			}
 
-	    @GetMapping
-	    public List<Document> getAllDocuments() {
-	        return service.getAllDocuments();
-	    }
+			private Long extractUserIdFromToken(HttpServletRequest request) 
+			{
+		   return null;
+	         }
 
-	    @GetMapping("/{id}")
-	    public Document getDocumentById(@PathVariable Long id) {
-	        return service.getDocumentById(id);
-	    }
+			@GetMapping
+			public List<Document> getAllDocuments() {
+				return service.getAllDocuments();
+			}
 
-	    @PutMapping("/{id}")
-	    public Document updateDocument(
-	            @PathVariable Long id,
-	            @RequestBody Document document) {
-	        return service.updateDocument(id, document);
-	    }
+			@GetMapping("/{id}")
+			public Document getDocumentById(@PathVariable Long id) {
+			return service.getDocumentById(id);
+			}
 
-	    @DeleteMapping("/{id}")
-	    public String deleteDocument(@PathVariable Long id) {
-	        service.deleteDocument(id);
-	        return "Document deleted successfully";
-	    }
+			@PutMapping("/{id}")
+			public Document updateDocument(@PathVariable Long id, @RequestBody Document document, HttpServletRequest request) {
+				Long userId = extractUserIdFromToken(request);
+				return service.updateDocument(id, document, userId);
+			}
+
+			@PatchMapping("/{id}")
+			public Document patchDocument(@PathVariable Long id, @RequestBody Document document, HttpServletRequest request) {
+				Long userId = extractUserIdFromToken(request);
+        	return service.patchDocument(id, document, userId);
+			}
+
+			@DeleteMapping("/{id}")
+			public String deleteDocument(@PathVariable Long id, HttpServletRequest request) {
+				Long userId = extractUserIdFromToken(request);
+				service.deleteDocument(id, userId);
+				return "Document deleted successfully";
+			}
 	    
-	    /* ==========================
-	            DOCUMENT CATEGORY 
-	       ========================== */
+	    //=========================  DOCUMENT CATEGORY ========================== //
+                 
+    
+			@PostMapping("/categories")
+			public DocumentCategory createCategory(@RequestBody DocumentCategory category) {
+			return service.createCategory(category);
+			}
 
-	    @PostMapping("/categories")
-	    public DocumentCategory createCategory(@RequestBody DocumentCategory category) {
-	        return service.createCategory(category);
-	    }
+			@GetMapping("/categories")
+			public List<DocumentCategory> getAllCategories() {
+				return service.getAllCategories();
+			}
 
-	    @GetMapping("/categories")
-	    public List<DocumentCategory> getAllCategories() {
-	        return service.getAllCategories();
-	    }
+			@GetMapping("/categories/{id}")
+			public DocumentCategory getCategoryById(@PathVariable Long id) {
+				return service.getCategoryById(id);
+			}
 
-	    @PutMapping("/categories/{id}")
-	    public DocumentCategory updateCategory(
-	            @PathVariable Long id,
-	            @RequestBody DocumentCategory category) {
-	        return service.updateCategory(id, category);
-	    }
+			@PutMapping("/categories/{id}")
+			public DocumentCategory updateCategory(@PathVariable Long id, @RequestBody DocumentCategory category) {
+				return service.updateCategory(id, category);
+			}
+			
+			@PatchMapping("/categories/{id}")
+			public DocumentCategory patchCategory(@PathVariable Long id, @RequestBody DocumentCategory category) {
+               return service.patchCategory(id, category);
+			}
 
-	    @DeleteMapping("/categories/{id}")
-	    public String deleteCategory(@PathVariable Long id) {
-	        service.deleteCategory(id);
-	        return "Category deleted successfully";
-	    }
+			@DeleteMapping("/categories/{id}")
+			public String deleteCategory(@PathVariable Long id) {
+				service.deleteCategory(id);
+				return "Category deleted successfully";
+			}
+			
+   //==========================DOCUMENT ACCESS LOG========================== //
 
-	    /* ==========================
-	       DOCUMENT VERSION
-	       ========================== */
+     		@PostMapping("/logs")
+     		public DocumentAccessLog logDocumentAction(@RequestBody DocumentAccessLog log, HttpServletRequest request) {
+     		Long userId = extractUserIdFromToken(request);
+     		log.setUserId(userId);
+     		return service.logAction(log);
+     		}
 
-	    @PostMapping("/versions")
-	    public DocumentVersion addDocumentVersion(
-	            @RequestBody DocumentVersion version) {
-	        return service.addDocumentVersion(version);
-	    }
+             @GetMapping("/logs")
+             public List<DocumentAccessLog> getAllLogs() {
+            	 return service.getAllLogs();
+             }
 
-	    @GetMapping("/{documentId}/versions")
-	    public List<DocumentVersion> getVersions(
-	            @PathVariable Long documentId) {
-	        return service.getVersionsByDocument(documentId);
-	    }
+             @GetMapping("/logs/{id}")
+             public DocumentAccessLog getLogById(@PathVariable Long id) {
+            	 return service.getLogById(id);
+             }
 
-	    /* ==========================
-	       DOCUMENT ACCESS LOG
-	       ========================== */
+             @PutMapping("/logs/{id}")
+             public DocumentAccessLog updateLog(@PathVariable Long id, @RequestBody DocumentAccessLog log) {
+            	 return service.updateLog(id, log);
+             }
 
-	    @PostMapping("/logs")
-	    public String logDocumentAction(
-	            @RequestParam Long documentId,
-	            @RequestParam Long userId,
-	            @RequestParam DocumentAccessLog.Action action) {
+             @PatchMapping("/logs/{id}")
+             public DocumentAccessLog patchLog(@PathVariable Long id, @RequestBody DocumentAccessLog log) {
+            	 return service.patchLog(id, log);
+             }
 
-	        Document document = service.getDocumentById(documentId);
-	       User user = new User();
-	       user.setUserId(userId);  
-	        return "Action logged successfully";
-	    }
+             @DeleteMapping("/logs/{id}")
+             public String deleteLog(@PathVariable Long id) {
+            	 service.deleteLog(id);
+            	 return "Log deleted successfully";
+             }
+	   
+             // ========================DOCUMENT VERSION ========================== //
 
-	    @GetMapping("/logs")
-	    public List<DocumentAccessLog> getAllLogs() {
-	        return service.getAllLogs();
-	    }
+             @PostMapping("/versions")
+             public DocumentVersion addDocumentVersion(@RequestBody DocumentVersion version) {
+            	 return service.addDocumentVersion(version);
+             }
 
-	    /* ==========================
-	              DOCUMENT SHARE 
-	       ========================== */
+             @GetMapping("/{documentId}/versions")
+             public List<DocumentVersion> getVersions(@PathVariable Long documentId) {
+            	 return service.getVersionsByDocument(documentId);
+             }
 
-	    @PostMapping("/share")
-	    public DocumentShare shareDocument(
-	            @RequestBody DocumentShare share) {
-	        return service.shareDocument(share);
-	    }
+             @GetMapping("/versions/{id}")
+             public DocumentVersion getVersionById(@PathVariable Long id) {
+            	 return service.getVersionById(id);
+             }
 
-	    @GetMapping("/shared/{userId}")
-	    public List<DocumentShare> getSharedDocuments(
-	            @PathVariable Long userId) {
-	        return service.getDocumentsSharedWithUser(userId);
-	    }
-	}
+             @PutMapping("/versions/{id}")
+             public DocumentVersion updateVersion(@PathVariable Long id, @RequestBody DocumentVersion version) {
+            	 return service.updateVersion(id, version);
+             }
 
+             @PatchMapping("/versions/{id}")
+             public DocumentVersion patchVersion(@PathVariable Long id, @RequestBody DocumentVersion version) {
+            	 return service.patchVersion(id, version);
+             	}
 
+             @DeleteMapping("/versions/{id}")
+             public String deleteVersion(@PathVariable Long id) {
+            	 service.deleteVersion(id);
+            	 return "Version deleted successfully";
+             }
+	    //==========================  DOCUMENT SHARE ========================== //
+             
+             @PostMapping("/share")
+             public DocumentShare shareDocument(@RequestBody DocumentShare share, HttpServletRequest request) {
+            	 Long userId = extractUserIdFromToken(request);
+            	 share.setSharedBy(userId);
+            	 return service.shareDocument(share);
+             }
+
+             @GetMapping("/shared")
+             public List<DocumentShare> getSharedDocuments(HttpServletRequest request) {
+            	 Long userId = extractUserIdFromToken(request);
+            	 return service.getDocumentsSharedWithUser(userId);
+             }
+
+             @GetMapping("/share/{id}")
+             public DocumentShare getSharedDocumentById(@PathVariable Long id) {
+            	 return service.getSharedDocumentById(id);
+             }
+
+             @PutMapping("/share/{id}")
+             public DocumentShare updateSharedDocument(@PathVariable Long id, @RequestBody DocumentShare share) {
+            	 return service.updateSharedDocument(id, share);
+             }
+
+             @PatchMapping("/share/{id}")
+             public DocumentShare patchSharedDocument(@PathVariable Long id, @RequestBody DocumentShare share) {
+            	 return service.patchSharedDocument(id, share);
+             }
+
+             @DeleteMapping("/share/{id}")
+             public String deleteSharedDocument(@PathVariable Long id) {
+            	 service.deleteSharedDocument(id);
+            	 return "Shared document deleted successfully";
+             }
+    }

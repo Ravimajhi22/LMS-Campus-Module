@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -327,19 +328,35 @@ public class LibraryServiceImpl {
         memberRepository.save(member);
     }
     public LibraryMember patchMember(Long memberId, Map<String, Object> updates) {
-        LibraryMember member = getMemberById(memberId);
 
-        if (updates.containsKey("userId"))
-            member.setUserId((Long) updates.get("userId"));
-        if (updates.containsKey("memberType"))
-            member.setMemberType((String) updates.get("memberType"));
-        if (updates.containsKey("maxBooksAllowed"))
-            member.setMaxBooksAllowed((Integer) updates.get("maxBooksAllowed"));
-        if (updates.containsKey("status"))
-            member.setStatus((String) updates.get("status"));
+        LibraryMember existing = getMemberById(memberId);
 
-        return memberRepository.save(member);
+        if (updates.containsKey("userId")) {
+            existing.setUserId(
+                    Long.valueOf(updates.get("userId").toString())
+            );
+        }
+
+        if (updates.containsKey("memberType")) {
+            existing.setMemberType(
+                    LibraryMember.MemberType.valueOf(
+                            updates.get("memberType").toString().toUpperCase()
+                    )
+            );
+        }
+
+        if (updates.containsKey("maxBooksAllowed")) {
+            existing.setMaxBooksAllowed(
+                    Integer.valueOf(updates.get("maxBooksAllowed").toString())
+            );
+        }
+
+
+
+        return memberRepository.save(existing);
     }
+
+   
     // ================= SETTINGS =================
 
     public LibrarySettings addSettings(LibrarySettings settings) {
@@ -369,5 +386,10 @@ public class LibraryServiceImpl {
         settings.setIsDeleted(true);
         librarySettingsRepository.save(settings);
     }
+
+	public @Nullable Object patchBook(Long id, Map<String, Object> updates) {
+	
+		return null;
+	}
     
 }

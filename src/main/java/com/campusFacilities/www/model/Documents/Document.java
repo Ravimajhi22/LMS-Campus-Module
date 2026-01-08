@@ -35,14 +35,9 @@ public class Document {
     private String fileType;
     private Long fileSize;
 
-	
-    @ManyToOne
-    @JoinColumn(name = "uploaded_by", nullable = false)
-    private User uploadedBy;
+    private Long uploadedBy;
+    private Long ownerUserId;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_user_id", nullable = false)
-    private User ownerUser;
 
     @Enumerated(EnumType.STRING)
     private AccessLevel accessLevel = AccessLevel.PRIVATE;

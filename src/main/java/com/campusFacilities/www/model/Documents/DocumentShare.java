@@ -26,20 +26,26 @@ public class DocumentShare {
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
-
 	
-	  @ManyToOne
-	  
-	  @JoinColumn(name = "shared_with", nullable = false) private User sharedWith;
-	  
-	  @ManyToOne
-	  
-	  @JoinColumn(name = "shared_by", nullable = false) private User sharedBy;
-	 
-
     private LocalDate expiryDate;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+	public void setSharedBy(Long userId) {
+		
+		
+	}
+
+	public Object getSharedWithUserId() {
+		
+		return null;
+	}
+
+	public void setSharedWithUserId(Object sharedWithUserId) {
+		
+		
+	}
+    
 }
 
