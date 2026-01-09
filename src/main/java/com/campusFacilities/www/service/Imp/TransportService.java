@@ -5,9 +5,20 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import com.campusFacilities.www.model.Transport.*;
-import com.campusFacilities.www.repository.*;
+import com.campusFacilities.www.model.Transport.Bus;
+import com.campusFacilities.www.model.Transport.BusPass;
+import com.campusFacilities.www.model.Transport.BusRoute;
+import com.campusFacilities.www.model.Transport.RouteWay;
+import com.campusFacilities.www.model.Transport.Stop;
+import com.campusFacilities.www.repository.BusGPSRepository;
+import com.campusFacilities.www.repository.BusPassRepository;
+import com.campusFacilities.www.repository.BusRepository;
+import com.campusFacilities.www.repository.BusRouteMappingRepository;
+import com.campusFacilities.www.repository.RouteWayRepository;
+import com.campusFacilities.www.repository.StopRepository;
 
 @Service
 public class TransportService {
@@ -27,7 +38,10 @@ public class TransportService {
     @Autowired
     private BusRouteMappingRepository busRouteMappingRepository;
 
-    // ================= BUS =================
+    
+    
+    
+    // ======================== BUS =========================//
 
     public Bus addBus(Bus bus) {
         RouteWay route = routeWayRepository.findById(bus.getRoute().getRouteId())
@@ -224,5 +238,12 @@ public class TransportService {
 
     public List<BusRoute> getByRouteId(Long routeId) {
         return busRouteMappingRepository.findByRoute_RouteId(routeId);
+    }
+    
+    //================BUS GPS==========================
+    
+    @GetMapping("/gps/bus/{busId}")
+    public BusGPSRepository getLatestLocation(@PathVariable Long busId) {
+        return BusGPSRepository.findTopByBusIdOrderByTimestampDesc(busId);
     }
 }
