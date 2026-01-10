@@ -28,12 +28,6 @@ public class DocumentAccessLog {
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
 
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "accessed_by", nullable = false) private User accessedBy;
-	 */
-
     @Enumerated(EnumType.STRING)
     private Action action;
 

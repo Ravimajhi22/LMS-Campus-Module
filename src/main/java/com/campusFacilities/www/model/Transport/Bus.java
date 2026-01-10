@@ -1,10 +1,7 @@
 package com.campusFacilities.www.model.Transport;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,25 +34,6 @@ public class Bus {
 
     @Enumerated(EnumType.STRING)
     private BusStatus busStatus;
-    
-    @Column(name = "driver_name")
-    private String driverName;
-
-    @Column(name = "driver_contact")
-    private String driverContact;
-    
-    @Column(name = "license_number")
-    private String licenseNumber;
-
-    @Column(name = "license_expiry")
-    private LocalDate licenseExpiry;
-
-    @Column(name = "experience_years")
-    private Integer experience;
-    
-    @Enumerated(EnumType.STRING)
-    @Column(name = "driver_status", nullable = false)
-    private DriverStatus driverStatus;
 
     @Column(name = "capacity")
     private Integer capacity;
@@ -73,17 +51,11 @@ public class Bus {
     @JoinColumn(name = "route_id", nullable = false)
     private RouteWay route;
      
-   public enum DriverStatus {
-    PENDING,
-    VERIFIED,
-    SUSPENDED,
-    REJECTED
-}
+  
    public enum BusStatus {
 	    ACTIVE,
 	    INACTIVE,
 	    DEACTIVE
 	}
-
   
 }

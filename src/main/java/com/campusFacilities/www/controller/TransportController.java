@@ -1,9 +1,7 @@
 package com.campusFacilities.www.controller;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,14 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.campusFacilities.www.model.Transport.Bus;
-import com.campusFacilities.www.model.Transport.BusPass;
 import com.campusFacilities.www.model.Transport.BusRoute;
 import com.campusFacilities.www.model.Transport.RouteWay;
 import com.campusFacilities.www.model.Transport.Stop;
 import com.campusFacilities.www.service.Imp.TransportService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,7 +29,7 @@ public class TransportController {
     private TransportService transportService;
 
 
-    // ================= BUS =================//
+    // ============================= BUS DETAILS ===================================//
 
     @PostMapping("/bus")
     @PreAuthorize("hasAuthority('BUS_CREATE')")
@@ -80,12 +75,7 @@ public class TransportController {
         if (updates.containsKey("busNumber"))
             bus.setBusNumber((String) updates.get("busNumber"));
 
-        if (updates.containsKey("driverName"))
-            bus.setDriverName((String) updates.get("driverName"));
-
-        if (updates.containsKey("driverContact"))
-            bus.setDriverContact((String) updates.get("driverContact"));
-
+     
         if (updates.containsKey("capacity"))
             bus.setCapacity((Integer) updates.get("capacity"));
 
@@ -94,7 +84,7 @@ public class TransportController {
         );
     }
 
-    // ================= ROUTE =================//
+   // ================================== BUS ROUTE================================================//
 
     @PostMapping("/route")
     @PreAuthorize("hasAuthority('ROUTE_CREATE')")
@@ -142,7 +132,7 @@ public class TransportController {
         return ResponseEntity.ok(transportService.patchRoute(routeId, route));
     }
 
-    // ================= STOP =================//
+ //===================================== STOP's Stations==============================================//
 
     @PostMapping("/stop")
     @PreAuthorize("hasAuthority('STOP_POINT_CREATE')")
@@ -186,46 +176,8 @@ public class TransportController {
         return ResponseEntity.ok(transportService.patchStop(stopId, stop));
     }
     
-    // ================= BUS PASS =================
-
-    @PostMapping("/buspass")
-    @PreAuthorize("hasAuthority('BUS_PASS_CREATE')")
-    public ResponseEntity<BusPass> addBusPass(@RequestBody BusPass busPass) {
-        return ResponseEntity.ok(transportService.addBusPass(busPass));
-    }
-
-    @GetMapping("/buspasses")
-    @PreAuthorize("hasAuthority('BUS_PASS_VIEW')")
-    public ResponseEntity<List<BusPass>> getAllBusPasses() {
-        return ResponseEntity.ok(transportService.getAllBusPasses());
-    }
-
-    @PutMapping("/buspass/{passId}")
-    @PreAuthorize("hasAuthority('BUS_PASS_UPDATE')")
-    public ResponseEntity<BusPass> updateBusPass(
-            @PathVariable Long passId,
-            @RequestBody BusPass busPass) {
-        return ResponseEntity.ok(transportService.updateBusPass(passId, busPass));
-    }
-
-    @DeleteMapping("/buspass/{passId}")
-    @PreAuthorize("hasAuthority('BUS_PASS_DELETE')")
-    public ResponseEntity<String> deleteBusPass(@PathVariable Long passId) {
-        transportService.deleteBusPass(passId);
-        return ResponseEntity.ok("Bus pass deleted successfully");
-    }
-
-    @PatchMapping("/buspass/{passId}")
-    @PreAuthorize("hasAuthority('BUS_PASS_UPDATE')")
-    public ResponseEntity<BusPass> patchBusPass(
-            @PathVariable Long passId,
-            @RequestBody Map<String, Object> updates) {
-
-        BusPass pass = new BusPass();
-        return ResponseEntity.ok(transportService.patchBusPass(passId, pass));
-    }
-
-  //==================== BusRouteMapping ========================
+	
+  //==================================== BusRouteMapping ===========================================//
 
     @PostMapping("/busroute")
     @PreAuthorize("hasAuthority('BUS_ROUTE_CREATE')")
@@ -262,7 +214,7 @@ public class TransportController {
         BusRoute busRoute = new BusRoute();
         return ResponseEntity.ok(transportService.patchBusRoute(id, busRoute));
         
-        //===================BUS GPS============================//
+        //=============================BUS GPS===================================//
    
        
         }

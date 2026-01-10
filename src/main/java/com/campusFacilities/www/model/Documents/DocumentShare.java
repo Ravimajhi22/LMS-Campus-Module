@@ -32,8 +32,7 @@ public class DocumentShare {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-	public void setSharedBy(Long userId) {
-		
+	public void setSharedBy(Long userId) {	
 		
 	}
 
@@ -43,7 +42,6 @@ public class DocumentShare {
 	}
 
 	public void setSharedWithUserId(Object sharedWithUserId) {
-		
 		
 	}
     

@@ -32,7 +32,7 @@ public class RouteWay {
     private String endPoint;
 
 	public void setDescription(String string) {
-		// TODO Auto-generated method stub
+	
 		
 	}
 
