@@ -1,14 +1,10 @@
 package com.campusFacilities.www.model.Transport;
 
 import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -17,41 +13,71 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "drivers")
-public class DriverDetails {
-
+public class DriverDetails 
+{
 	
-
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long driverId;
-
 	    @Column(nullable = false)
 	    private String name;
 
 	    @Column(nullable = false, unique = true)
 	    private String contactNumber;
-
+	    
 	    @Column(nullable = false, unique = true)
 	    private String licenseNumber;
 
 	    @Column(nullable = false)
 	    private LocalDate licenseExpiryDate;
-
+	    
+	    @Enumerated(EnumType.STRING)
+	    private Role role;
+	    
+	    public enum Role
+	    {
+	    	DRIVER, CONDUCTOR ,HELPER
+	    }
+	    
+	    @Enumerated(EnumType.STRING)
+	    private ExperienceCategory experienceCategory;
+	    
+	    public enum ExperienceCategory
+	    {
+	    	SCHOOLBUS, HEAVYVEHICLE, LIGHTVEHICLE ,BOTHSCHOOLBUSANDHEAVYVEHICLE
+	    }
+	    
+	    private Boolean backgroundVerified;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private ShiftType shift;
+	    
+	    public enum ShiftType {
+             MORNING, EVENING ,BOTH 
+             
+                              }
 	    @Column(nullable = false)
 	    private Integer experienceYears;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private LicenseValidityStatus licenseValidityStatus;
 
+	    public enum LicenseValidityStatus {
+	        VALID,
+	        EXPIRED,
+	        EXPIRING_SOON
+	    }
 	    // Assigned Bus (Vehicle)
+	    
 	    @ManyToOne
-	    @JoinColumn(name = "bus_id")
-	    private Bus bus;
+	    @JoinColumn(name = "Vehicle")
+	    private Vehicle vehicle;
 
 	    // Assigned Route
 	    @ManyToOne
-	    @JoinColumn(name = "route_id")
+	    @JoinColumn(name = "route_code")
 	    private RouteWay route;
 
 	    @Enumerated(EnumType.STRING)
 	    @Column(nullable = false)
+	   
 	    private DriverStatus verificationStatus;
 	   
 	    public enum DriverStatus {

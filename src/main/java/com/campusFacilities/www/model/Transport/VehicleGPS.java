@@ -1,5 +1,4 @@
 package com.campusFacilities.www.model.Transport;
-
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BusGPS {
+public class VehicleGPS {
 	
-	 @Id
+	    @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
 
@@ -32,6 +31,8 @@ public class BusGPS {
 	    @Column(nullable = false)
 	    private double speed;
 
+	    private String status; 
+	    
 	    @Column(nullable = false)
 	    private LocalDateTime timestamp;
 }

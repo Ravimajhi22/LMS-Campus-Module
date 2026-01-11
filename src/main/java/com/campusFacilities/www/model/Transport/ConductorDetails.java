@@ -36,8 +36,8 @@ public class ConductorDetails {
 
 	    // Assigned Bus
 	    @ManyToOne
-	    @JoinColumn(name = "bus_id")
-	    private Bus bus;
+	    @JoinColumn(name = "")
+	    private Vehicle vehicle;
 
 	    // Assigned Route
 	    @ManyToOne

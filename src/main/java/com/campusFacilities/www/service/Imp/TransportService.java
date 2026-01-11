@@ -1,19 +1,15 @@
 package com.campusFacilities.www.service.Imp;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.campusFacilities.www.model.Transport.Bus;
-import com.campusFacilities.www.model.Transport.BusRoute;
+import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.RouteWay;
-import com.campusFacilities.www.model.Transport.Stop;
-import com.campusFacilities.www.repository.BusGPSRepository;
-import com.campusFacilities.www.repository.BusRepository;
-import com.campusFacilities.www.repository.BusRouteMappingRepository;
-import com.campusFacilities.www.repository.RouteWayRepository;
-import com.campusFacilities.www.repository.StopRepository;
+import com.campusFacilities.www.repository.Transport.BusGPSRepository;
+import com.campusFacilities.www.repository.Transport.BusRepository;
+import com.campusFacilities.www.repository.Transport.RouteWayRepository;
+
 
 @Service
 public class TransportService {
@@ -22,51 +18,36 @@ public class TransportService {
     private BusRepository busRepository;
 
     @Autowired
-    private RouteWayRepository routeWayRepository;
-
-    @Autowired
-    private StopRepository stopRepository;
-
-   // @Autowired
-   // private BusPassRepository busPassRepository;
-
-    @Autowired
-    private BusRouteMappingRepository busRouteMappingRepository;
-
-    
+    private RouteWayRepository routeWayRepository;    
     
     
     // ======================== BUS =========================//
 
-    public Bus addBus(Bus bus) {
+    public Vehicle addBus(Vehicle bus) {
         RouteWay route = routeWayRepository.findById(bus.getRoute().getRouteId())
                 .orElseThrow(() -> new RuntimeException("Route not found"));
         bus.setRoute(route);
         return busRepository.save(bus);
     }
 
-    public List<Bus> getAllBuses() {
+    public List<Vehicle> getAllBuses() {
         return busRepository.findAll();
     }
 
-    public Bus updateBus(Long busId, Bus bus) {
-        Bus existing = busRepository.findById(busId)
+    public Vehicle updateBus(Long busId, Vehicle bus) {
+        Vehicle existing = busRepository.findById(busId)
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
-
-        existing.setBusNumber(bus.getBusNumber());
         existing.setCapacity(bus.getCapacity());
         existing.setRoute(bus.getRoute());
 
         return busRepository.save(existing);
     }
 
-    public Bus patchBus(Long busId, Bus bus) {
-        Bus existing = busRepository.findById(busId)
+    public Vehicle patchBus(Long busId, Vehicle bus) {
+        Vehicle existing = busRepository.findById(busId)
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
 
-        if (bus.getBusNumber() != null)
-            existing.setBusNumber(bus.getBusNumber());
-
+ 
         if (bus.getCapacity() != null)
             existing.setCapacity(bus.getCapacity());
 
@@ -98,9 +79,6 @@ public class TransportService {
                 .orElseThrow(() -> new RuntimeException("Route not found"));
 
         existing.setRouteName(routeWay.getRouteName());
-        existing.setStartPoint(routeWay.getStartPoint());
-        existing.setEndPoint(routeWay.getEndPoint());
-
         return routeWayRepository.save(existing);
     }
 
@@ -118,70 +96,6 @@ public class TransportService {
     public void deleteRoute(Long routeId) {
         routeWayRepository.deleteById(routeId);
     }
-
-    // ================= STOP =================
-
-    public Stop addStop(Stop stop) {
-        return stopRepository.save(stop);
-    }
-
-    public List<Stop> getStopsByRoute(Long routeId) {
-        return stopRepository.findByRouteRouteIdOrderBySequenceNumber(routeId);
-    }
-
-    public Stop updateStop(Long stopId, Stop stop) {
-        Stop existing = stopRepository.findById(stopId)
-                .orElseThrow(() -> new RuntimeException("Stop not found"));
-
-        existing.setStopName(stop.getStopName());
-        existing.setSequenceNumber(stop.getSequenceNumber());
-        existing.setRoute(stop.getRoute());
-
-        return stopRepository.save(existing);
-    }
-
-    public Stop patchStop(Long stopId, Stop stop) {
-        Stop existing = stopRepository.findById(stopId)
-                .orElseThrow(() -> new RuntimeException("Stop not found"));
-
-        if (stop.getStopName() != null)
-            existing.setStopName(stop.getStopName());
-
-
-        return stopRepository.save(existing);
-    }
-
-    public void deleteStop(Long stopId) {
-        stopRepository.deleteById(stopId);
-    }
-
-   
-	  // ================= BUS ROUTE ================
-	  public BusRoute saveBusRoute(BusRoute busRoute) { return
-	  busRouteMappingRepository.save(busRoute); }
-	  
-	  public List<BusRoute> getAllBusRoutes() { return
-	  busRouteMappingRepository.findAll(); }
-	  
-	  public Optional<BusRoute> getBusRouteById(Long id) { return
-	  busRouteMappingRepository.findById(id); }
-	  
-	  public BusRoute patchBusRoute(Long id, BusRoute busRoute) { BusRoute existing
-	  = busRouteMappingRepository.findById(id) .orElseThrow(() -> new
-	  RuntimeException("BusRoute not found"));
-	  
-	  
-	  return busRouteMappingRepository.save(existing); }
-	  
-	  public void deleteBusRoute(Long id) {
-	  busRouteMappingRepository.deleteById(id); }
-	  
-	  public List<BusRoute> getByBusId(Long busId) { return
-	  busRouteMappingRepository.findByBus_BusId(busId); }
-	  
-	  public List<BusRoute> getByRouteId(Long routeId) { return
-	  busRouteMappingRepository.findByRoute_RouteId(routeId); }
-	 
     //================BUS GPS==========================
     
     @GetMapping("/gps/bus/{busId}")

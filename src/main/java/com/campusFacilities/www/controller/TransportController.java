@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.campusFacilities.www.model.Transport.Bus;
-import com.campusFacilities.www.model.Transport.BusRoute;
+import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.RouteWay;
-import com.campusFacilities.www.model.Transport.Stop;
 import com.campusFacilities.www.service.Imp.TransportService;
 import lombok.RequiredArgsConstructor;
 
@@ -33,14 +31,14 @@ public class TransportController {
 
     @PostMapping("/bus")
     @PreAuthorize("hasAuthority('BUS_CREATE')")
-    public ResponseEntity<?> addBus(@RequestBody Bus bus) {
+    public ResponseEntity<?> addBus(@RequestBody Vehicle bus) {
         return ResponseEntity.ok(transportService.addBus(bus));
     }
     
     
     @GetMapping("/buses")
     @PreAuthorize("hasAuthority('BUS_VIEW')")
-    public List<Bus> getAllBuses() {
+    public List<Vehicle> getAllBuses() {
         return transportService.getAllBuses();
     }
 
@@ -48,7 +46,7 @@ public class TransportController {
     @PreAuthorize("hasAuthority('BUS_UPDATE')")
     public ResponseEntity<?> updateBus(
             @PathVariable Long busId,
-            @RequestBody Bus bus) {
+            @RequestBody Vehicle bus) {
 
         return ResponseEntity.ok(
                 transportService.updateBus(busId, bus)
@@ -70,11 +68,7 @@ public class TransportController {
             @PathVariable Long busId,
             @RequestBody Map<String, Object> updates) {
 
-        Bus bus = new Bus();
-
-        if (updates.containsKey("busNumber"))
-            bus.setBusNumber((String) updates.get("busNumber"));
-
+        Vehicle bus = new Vehicle();
      
         if (updates.containsKey("capacity"))
             bus.setCapacity((Integer) updates.get("capacity"));
@@ -126,97 +120,12 @@ public class TransportController {
         if (updates.containsKey("routeName"))
             route.setRouteName((String) updates.get("routeName"));
 
-        if (updates.containsKey("description"))
-            route.setDescription((String) updates.get("description"));
-
+ 
         return ResponseEntity.ok(transportService.patchRoute(routeId, route));
     }
-
- //===================================== STOP's Stations==============================================//
-
-    @PostMapping("/stop")
-    @PreAuthorize("hasAuthority('STOP_POINT_CREATE')")
-    public ResponseEntity<Stop> addStop(@RequestBody Stop stop) {
-        return ResponseEntity.ok(transportService.addStop(stop));
-    }
-    
-    @GetMapping("/stop/route/{routeId}")
-    @PreAuthorize("hasAuthority('STOP_POINT_VIEW')")
-    public ResponseEntity<List<Stop>> getStopsByRoute(@PathVariable Long routeId) {
-        return ResponseEntity.ok(transportService.getStopsByRoute(routeId));
-    }
-    
-    @PutMapping("/stop/{stopId}")
-    @PreAuthorize("hasAuthority('STOP_POINT_UPDATE')")
-    public ResponseEntity<Stop> updateStop(
-            @PathVariable Long stopId,
-            @RequestBody Stop stop) {
-        return ResponseEntity.ok(transportService.updateStop(stopId, stop));
-    }
-
-    @DeleteMapping("/stop/{stopId}")
-    @PreAuthorize("hasAuthority('STOP_POINT_DELETE')")
-    public ResponseEntity<String> deleteStop(@PathVariable Long stopId) {
-        transportService.deleteStop(stopId);
-        return ResponseEntity.ok("Stop deleted successfully");
-    }
-    
-    @PatchMapping("/stop/{stopId}")
-    @PreAuthorize("hasAuthority('STOP_POINT_UPDATE')")
-    public ResponseEntity<Stop> patchStop(
-            @PathVariable Long stopId,
-            @RequestBody Map<String, Object> updates) {
-
-        Stop stop = new Stop();
-
-        if (updates.containsKey("stopName")) {
-            stop.setStopName((String) updates.get("stopName"));
-        }
-
-        return ResponseEntity.ok(transportService.patchStop(stopId, stop));
-    }
-    
-	
-  //==================================== BusRouteMapping ===========================================//
-
-    @PostMapping("/busroute")
-    @PreAuthorize("hasAuthority('BUS_ROUTE_CREATE')")
-    public ResponseEntity<BusRoute> addBusRoute(@RequestBody BusRoute busRoute) {
-        return ResponseEntity.ok(transportService.saveBusRoute(busRoute));
-    }
-
-    @GetMapping("/busroutes")
-    @PreAuthorize("hasAuthority('BUS_ROUTE_VIEW')")
-    public ResponseEntity<List<BusRoute>> getAllBusRoutes() {
-        return ResponseEntity.ok(transportService.getAllBusRoutes());
-    }
-
-    @GetMapping("/busroute/{id}")
-    public ResponseEntity<BusRoute> getBusRouteById(@PathVariable Long id) {
-        return transportService.getBusRouteById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/busroute/{id}")
-    @PreAuthorize("hasAuthority('BUS_ROUTE_DELETE')")
-    public ResponseEntity<String> deleteBusRoute(@PathVariable Long id) {
-        transportService.deleteBusRoute(id);
-        return ResponseEntity.ok("Bus route mapping deleted successfully");
-    }
-   
-    @PatchMapping("/busroute/{id}")
-    @PreAuthorize("hasAuthority('BUS_ROUTE_UPDATE')")
-    public ResponseEntity<BusRoute> patchBusRoute(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> updates) {
-
-        BusRoute busRoute = new BusRoute();
-        return ResponseEntity.ok(transportService.patchBusRoute(id, busRoute));
-        
         //=============================BUS GPS===================================//
    
        
         }
 
-    }
+    

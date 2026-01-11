@@ -1,4 +1,4 @@
-package com.campusFacilities.www.repository;
+package com.campusFacilities.www.repository.Transport;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

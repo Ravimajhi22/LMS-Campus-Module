@@ -33,11 +33,29 @@ import lombok.Data;
 	    private Long stopId;
 
 	    private LocalDate attendanceDate;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private AttendanceStatus status;
+	    
+	    public enum AttendanceStatus {
+	        PRESENT,
+	        ABSENT,
+	        SKIPPED
+	    }
+	    @Enumerated(EnumType.STRING)
+	    private MarkedBy markedBy;
+	    
+	    public enum MarkedBy {
+	        MANUAL,
+	        QR,
+	        GPS
+	    }
 
 	    @Enumerated(EnumType.STRING)
 	    private TransportAttendanceStatus pickupStatus;
 	    
-	    public enum TransportAttendanceStatus {
+	    public enum TransportAttendanceStatus 
+	    {
 	        PICKED_UP,
 	        DROPPED,
 	        ABSENT,

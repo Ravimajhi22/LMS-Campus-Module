@@ -33,6 +33,7 @@ public class LibraryMember {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum MemberType { STUDENT, STAFF }
+  
     public enum Status { ACTIVE, BLOCKED }
 
 }

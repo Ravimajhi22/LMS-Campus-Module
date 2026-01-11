@@ -1,10 +1,14 @@
 package com.campusFacilities.www.model.Transport;
 
+import java.util.List;
+
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,26 +19,38 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RouteWay {
+public class RouteWay 
+
+{
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "route_id")
-    private Long routeId;
+    @Column(name = "route_Code")
+    private Long routeCode;
 
     @Column(name = "route_name", nullable = false)
     private String routeName;
+    
+    @ElementCollection
+    @CollectionTable(name = "route_pickup_points", joinColumns = @JoinColumn(name = "route_id"))
+    @Column(name = "pickup_point")
+    private List<String> pickupPoints;
 
-    @Column(name = "start_point", nullable = false)
-    private String startPoint;
+    @ElementCollection
+    @CollectionTable(name = "route_drop_points", joinColumns = @JoinColumn(name = "route_id"))
+    @Column(name = "drop_point")
+    private List<String> dropPoints;
+    
+    private Double distanceKm;
+    
+    private Integer estimatedTimeMinutes;
+    
+    private Integer MaxStudents;
 
-    @Column(name = "end_point", nullable = false)
-    private String endPoint;
-
-	public void setDescription(String string) {
-	
-		
-	}
-
+    @ManyToOne
+    @JoinColumn(name = "Vechicle_number")
+    private Vehicle assigndVehicle;
+    
+    @Column(nullable = false)
+    private Boolean active = true;
     
 }
