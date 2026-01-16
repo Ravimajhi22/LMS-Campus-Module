@@ -1,5 +1,6 @@
 package com.campusFacilities.www.model.Transport;
 import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,12 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VehicleGPS {
 	
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
 
-	    @Column(nullable = false)
-	    private Long busId;
+		@Id
+      	@GeneratedValue(strategy = GenerationType.IDENTITY)
+      	private Long id;
+	
+	    @Column(nullable = false, unique = true)
+	    private String contactNumber;
 
 	    @Column(nullable = false)
 	    private double latitude;

@@ -26,11 +26,10 @@ import lombok.Data;
 	    
 	    private Long dropStopId;
 
-	    private Long busId;
+	    private Long VechileId;
 
 	    private Long routeId;
 
-	    private Long stopId;
 
 	    private LocalDate attendanceDate;
 	    
@@ -53,7 +52,6 @@ import lombok.Data;
 
 	    @Enumerated(EnumType.STRING)
 	    private TransportAttendanceStatus pickupStatus;
-	    
 	    public enum TransportAttendanceStatus 
 	    {
 	        PICKED_UP,

@@ -1,10 +1,12 @@
 package com.campusFacilities.www.model.Transport;
 
 import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,7 +20,8 @@ public class DriverDetails
 	
 	    @Column(nullable = false)
 	    private String name;
-
+        
+	    @Id
 	    @Column(nullable = false, unique = true)
 	    private String contactNumber;
 	    
@@ -30,7 +33,6 @@ public class DriverDetails
 	    
 	    @Enumerated(EnumType.STRING)
 	    private Role role;
-	    
 	    public enum Role
 	    {
 	    	DRIVER, CONDUCTOR ,HELPER
@@ -38,7 +40,6 @@ public class DriverDetails
 	    
 	    @Enumerated(EnumType.STRING)
 	    private ExperienceCategory experienceCategory;
-	    
 	    public enum ExperienceCategory
 	    {
 	    	SCHOOLBUS, HEAVYVEHICLE, LIGHTVEHICLE ,BOTHSCHOOLBUSANDHEAVYVEHICLE
@@ -48,11 +49,9 @@ public class DriverDetails
 	    
 	    @Enumerated(EnumType.STRING)
 	    private ShiftType shift;
-	    
 	    public enum ShiftType {
-             MORNING, EVENING ,BOTH 
-             
-                              }
+             MORNING, EVENING ,BOTH }
+	    
 	    @Column(nullable = false)
 	    private Integer experienceYears;
 	    

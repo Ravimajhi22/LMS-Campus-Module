@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.campusFacilities.www.Transport.Config.JwtUtil;
 import com.campusFacilities.www.model.Documents.Document;
 import com.campusFacilities.www.model.Documents.DocumentAccessLog;
 import com.campusFacilities.www.model.Documents.DocumentCategory;
@@ -31,8 +29,7 @@ import lombok.RequiredArgsConstructor;
 	 @Autowired
 	 private DocumentServiceImpl service;
 
-	  @Autowired
-	  private JwtUtil jwtUtil;
+	
 
 	  
 	//========================== DOCUMENT ========================== //

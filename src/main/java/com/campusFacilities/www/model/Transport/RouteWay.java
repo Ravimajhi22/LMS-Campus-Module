@@ -6,9 +6,11 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +25,10 @@ public class RouteWay
 
 {
 
-	@Id
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
     @Column(name = "route_Code")
     private Long routeCode;
 
@@ -46,11 +51,23 @@ public class RouteWay
     
     private Integer MaxStudents;
 
-    @ManyToOne
-    @JoinColumn(name = "Vechicle_number")
-    private Vehicle assigndVehicle;
+    @OneToMany(mappedBy = "route")
+    private List<Vehicle> vehicles;
+
     
     @Column(nullable = false)
     private Boolean active = true;
+
+
+	public Object getAssigndVehicle() {
+		
+		return null;
+	}
+
+
+	public void setAssigndVehicle(Vehicle vehicle) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

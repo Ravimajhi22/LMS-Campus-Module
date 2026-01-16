@@ -40,6 +40,10 @@ public class Books {
     private String publisher;
 
     private String edition;
+    
+    private String year;
+    
+    private String ShelfLocation;
 
     private Integer totalCopies = 1;
 
