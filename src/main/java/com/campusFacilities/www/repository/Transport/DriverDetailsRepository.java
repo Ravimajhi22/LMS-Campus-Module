@@ -21,7 +21,8 @@ public interface DriverDetailsRepository extends JpaRepository<DriverDetails, Lo
 
     List<DriverDetails> findByRole(Role role);
 
-    List<DriverDetails> findByVehicle_VechicleNumber(String vechicleNumber);
+    List<DriverDetails> findByVehicle_VehicleNumber(String vehicleNumber);
 
-    List<DriverDetails> findByRoute_RouteCode(Long routeCode);
+    List<DriverDetails> findByRoute_Id(Long routeId);
+    
 }

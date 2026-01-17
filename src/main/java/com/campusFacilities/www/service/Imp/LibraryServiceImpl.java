@@ -313,7 +313,7 @@ public class LibraryServiceImpl {
 
         LibraryMember existing = getMemberById(memberId);
 
-        existing.setUserId(updatedMember.getUserId());
+
         existing.setMemberType(updatedMember.getMemberType());
         existing.setMaxBooksAllowed(updatedMember.getMaxBooksAllowed());
         existing.setStatus(updatedMember.getStatus());
@@ -327,11 +327,13 @@ public class LibraryServiceImpl {
         member.setIsDeleted(true);
         memberRepository.save(member);
     }
-    public LibraryMember patchMember(Long memberId, Map<String, Object> updates) {
-
-        LibraryMember existing = getMemberById(memberId);
-
-        if (updates.containsKey("userId")) {
+	/*
+	 * public LibraryMember patchMember(Long memberId, Map<String, Object> updates)
+	 * {
+	 * 
+	 * LibraryMember existing = getMemberById(memberId);
+	 */
+       /* if (updates.containsKey("userId")) {
             existing.setUserId(
                     Long.valueOf(updates.get("userId").toString())
             );
@@ -356,7 +358,7 @@ public class LibraryServiceImpl {
         return memberRepository.save(existing);
     }
 
-   
+   */
     // ================= SETTINGS =================
 
     public LibrarySettings addSettings(LibrarySettings settings) {

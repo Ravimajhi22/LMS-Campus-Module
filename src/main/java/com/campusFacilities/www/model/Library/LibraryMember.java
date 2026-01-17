@@ -1,5 +1,7 @@
 package com.campusFacilities.www.model.Library;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,22 +20,47 @@ public class LibraryMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    private Long userId;
 
-    @Enumerated(EnumType.STRING)
-    private MemberType memberType;
+    // ===== USER DETAILS =====
 
-    private Integer maxBooksAllowed = 3;
+    @Column(nullable = false)
+    private String fullName;
 
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.ACTIVE;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true)
+    private String mobileNumber;
+    
+    // ===== SYSTEM FIELDS =====
 
     private Boolean isDeleted = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public enum MemberType { STUDENT, STAFF }
-  
-    public enum Status { ACTIVE, BLOCKED }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberType memberType; 
+    
+    public enum MemberType {
+        STUDENT,
+        STAFF, MEMBER ,LIBRAIAN , ADMIN 
+    }                                 // STUDENT / STAFF
+
+    @Column(unique = true)
+    private String studentId;        // Roll No / Student ID
+
+    private String department;       // UG Engineering, MBA, etc.
+
+    private Integer maxBooksAllowed = 3;
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+    
+    public enum Status 
+    {
+        ACTIVE,
+        BLOCKED
+    }
 
 }

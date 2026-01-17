@@ -8,6 +8,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -20,19 +22,25 @@ import lombok.Data;
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
 
+	    /* ================= STUDENT ================= */
+	   
 	    private Long studentId;
-	    
-	    private Long pickupStopId;
-	    
-	    private Long dropStopId;
 
-	    private Long VechileId;
+	    /* ================= VEHICLE (BY VEHICLE NUMBER) ================= */
+	   
+	    @ManyToOne
+	    @JoinColumn(name = "vehicle_id", nullable = false) // FK → Vehicle.id
+	    private Vehicle vehicle;
 
-	    private Long routeId;
+	    /* ================= ROUTE (BY ROUTE CODE) ================= */
+	   
+	    @ManyToOne
+	    @JoinColumn(name = "route_id", nullable = false) // FK → RouteWay.id
+	    private RouteWay route;
 
-
+	    /* ================= DATE ================= */
 	    private LocalDate attendanceDate;
-	    
+
 	    @Enumerated(EnumType.STRING)
 	    private AttendanceStatus status;
 	    

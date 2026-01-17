@@ -1,6 +1,7 @@
 package com.campusFacilities.www.repository.Transport;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -9,12 +10,15 @@ import com.campusFacilities.www.model.Transport.VehicleGPS;
 
 @Repository
 public interface VehicleGPSRepository
-        extends JpaRepository<VehicleGPS, Long> {
+        extends JpaRepository<VehicleGPS, Long> 
+{ 
+    List<VehicleGPS> findByVehicle_Id(Long vehicleId);
 
-    // Latest GPS entry of a bus
-    VehicleGPS findTopByBusIdOrderByTimestampDesc(Long busId);
+   
+    List<VehicleGPS> findByVehicle_VehicleNumber(String vehicleNumber);
 
-    // Full GPS history of a bus
-    List<VehicleGPS> findByBusIdOrderByTimestampDesc(Long busId);
+  
+    Optional<VehicleGPS> findTopByVehicle_IdOrderByTimestampDesc(Long vehicleId);
+    
 }
 

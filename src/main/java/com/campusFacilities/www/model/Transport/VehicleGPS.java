@@ -3,9 +3,13 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,20 +25,39 @@ public class VehicleGPS {
       	@GeneratedValue(strategy = GenerationType.IDENTITY)
       	private Long id;
 	
-	    @Column(nullable = false, unique = true)
-	    private String contactNumber;
+		 /* ================= VEHICLE REFERENCE ================= */
+		   
+		@ManyToOne
+		@JoinColumn(name = "vehicle_id", nullable = false) // FK → Vehicle.id
+		private Vehicle vehicle;
 
+
+	    /* ================= LOCATION ================= */
+	  
 	    @Column(nullable = false)
 	    private double latitude;
 
 	    @Column(nullable = false)
 	    private double longitude;
 
-	    @Column(nullable = false)
-	    private double speed;
+	    /* ================= SPEED ================= */
+	   
+	        private double speed; 
 
-	    private String status; 
-	    
-	    @Column(nullable = false)
-	    private LocalDateTime timestamp;
+	    /* ================= STATUS ================= */
+	   
+	    @Enumerated(EnumType.STRING)
+	    private VehicleGPSStatus status;
+
+	    public enum VehicleGPSStatus {
+	        ACTIVE,
+	        STOPPED,
+	        IDLE,
+	        OFFLINE
+	    }
+
+		public void setTimestamp(LocalDateTime now) {
+			
+			
+		}
 }

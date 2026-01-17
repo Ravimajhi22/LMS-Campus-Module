@@ -1,11 +1,12 @@
 package com.campusFacilities.www.model.Transport;
-
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,10 +19,14 @@ import lombok.Data;
 public class DriverDetails 
 {
 	
+	    @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long driverId;
+	
+	
 	    @Column(nullable = false)
 	    private String name;
         
-	    @Id
 	    @Column(nullable = false, unique = true)
 	    private String contactNumber;
 	    
@@ -49,6 +54,7 @@ public class DriverDetails
 	    
 	    @Enumerated(EnumType.STRING)
 	    private ShiftType shift;
+	    
 	    public enum ShiftType {
              MORNING, EVENING ,BOTH }
 	    
@@ -61,19 +67,9 @@ public class DriverDetails
 	    public enum LicenseValidityStatus {
 	        VALID,
 	        EXPIRED,
-	        EXPIRING_SOON
+	        EXPIRINGSOON
 	    }
-	    // Assigned Bus (Vehicle)
-	    
-	    @ManyToOne
-	    @JoinColumn(name = "Vehicle")
-	    private Vehicle vehicle;
-
-	    // Assigned Route
-	    @ManyToOne
-	    @JoinColumn(name = "route_code")
-	    private RouteWay route;
-
+	 
 	    @Enumerated(EnumType.STRING)
 	    @Column(nullable = false)
 	   
@@ -89,6 +85,20 @@ public class DriverDetails
 	    @Column(nullable = false)
 	    private Boolean active = true;
 	    
+	    /* ================= VEHICLE ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "vehicle_id")
+	    private Vehicle vehicle;
+
+	    /* ================= ROUTE ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "route_id") 
+	    private RouteWay route;
+
+	    /* ================= CONDUCTOR ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "conductor_id") 
+	    private ConductorDetails conductor;
 	    
 	}
 

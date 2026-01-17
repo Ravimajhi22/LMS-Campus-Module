@@ -2,7 +2,6 @@ package com.campusFacilities.www.repository.Transport;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,25 +12,24 @@ import com.campusFacilities.www.model.Transport.TransportAttendance;
 public interface TransportAttendanceRepository
         extends JpaRepository<TransportAttendance, Long> {
 
-    // Attendance of a student for a day
-    Optional<TransportAttendance> findByStudentIdAndAttendanceDate(
-            Long studentId, LocalDate attendanceDate);
+	// Attendance by vehicle + date
+    List<TransportAttendance>
+    findByVehicle_IdAndAttendanceDate(Long vehicleId, LocalDate attendanceDate);
 
-    // All attendance for a bus on a date
-    List<TransportAttendance> findByBusIdAndAttendanceDate(
-            Long busId, LocalDate attendanceDate);
+    // Attendance by vehicle ID
+    List<TransportAttendance>
+    findByVehicle_Id(Long vehicleId);
 
-    // Attendance by route & date
-    List<TransportAttendance> findByRouteIdAndAttendanceDate(
-            Long routeId, LocalDate attendanceDate);
+    // Attendance by vehicle number (MATCH ENTITY FIELD)
+    List<TransportAttendance>
+    findByVehicle_VehicleNumber(String vehicleNumber);
 
-    // Pickup status report
-    List<TransportAttendance> findByBusIdAndPickupStatus(
-            Long busId,
-            TransportAttendance.TransportAttendanceStatus pickupStatus);
+    // Attendance by student
+    List<TransportAttendance>
+    findByStudentId(Long studentId);
 
-    // Drop status report
-    List<TransportAttendance> findByBusIdAndDropStatus(
-            Long busId,
-            TransportAttendance.TransportAttendanceStatus dropStatus);
+    // Attendance by date
+    List<TransportAttendance>
+    findByAttendanceDate(LocalDate attendanceDate);
+
 }

@@ -24,10 +24,9 @@ import lombok.NoArgsConstructor;
 public class RouteWay 
 
 {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	    @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;;
     
     @Column(name = "route_Code")
     private Long routeCode;
@@ -51,6 +50,8 @@ public class RouteWay
     
     private Integer MaxStudents;
 
+    /* =============VEHICLES ASSIGNED TO THIS ROUTE =========*/
+  
     @OneToMany(mappedBy = "route")
     private List<Vehicle> vehicles;
 
@@ -59,15 +60,5 @@ public class RouteWay
     private Boolean active = true;
 
 
-	public Object getAssigndVehicle() {
-		
-		return null;
-	}
-
-
-	public void setAssigndVehicle(Vehicle vehicle) {
-		// TODO Auto-generated method stub
-		
-	}
     
 }

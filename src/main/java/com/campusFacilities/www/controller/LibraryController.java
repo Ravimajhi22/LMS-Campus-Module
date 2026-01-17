@@ -238,11 +238,13 @@ public class LibraryController {
         libraryService.deleteMember(id);
         return ResponseEntity.ok("Library member deleted successfully");
     }
-    @PatchMapping("/members/{id}")
-    @PreAuthorize("hasAuthority('MEMBER_UPDATE')")
-    public ResponseEntity<?> patchMember(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return ResponseEntity.ok(libraryService.patchMember(id, updates));
-    }
+	/*
+	 * @PatchMapping("/members/{id}")
+	 * 
+	 * @PreAuthorize("hasAuthority('MEMBER_UPDATE')") public ResponseEntity<?>
+	 * patchMember(@PathVariable Long id, @RequestBody Map<String, Object> updates)
+	 * { return ResponseEntity.ok(libraryService.patchMember(id, updates)); }
+	 */
 
     // ================== SETTINGS ==================//
     

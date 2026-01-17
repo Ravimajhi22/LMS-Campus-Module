@@ -14,7 +14,8 @@ public interface ConductorDetailsRepository
     List<ConductorDetails> findByVerificationStatus(
             ConductorVerificationStatus status);
 
-    List<ConductorDetails> findByVehicle_VechicleNumber(String vechicleNumber);
-
-    List<ConductorDetails> findByRoute_RouteCode(Long routeCode);
+    List<ConductorDetails> findByVehicle_VehicleNumber(String vehicleNumber);
+    
+    
+    List<ConductorDetails> findByRoute_Id(Long routeId);
 }

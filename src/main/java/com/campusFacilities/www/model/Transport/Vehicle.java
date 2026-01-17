@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Vehicle")
+@Table(name = "Vehicles")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,9 +29,10 @@ public class Vehicle {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	    
-    @Column(name = "Vechicle_number", nullable = false, unique = true)
-    private String VechicleNumber;
-
+    @Column(name = "vehicle_number", nullable = false, unique = true)
+    private String vehicleNumber;
+    
+    
 	@Enumerated(EnumType.STRING)
     private VehicleType vehicletype;
 	
@@ -58,23 +59,16 @@ public class Vehicle {
     @CreationTimestamp
     @Column(name = "created_date", updatable = false, nullable = false)
     private LocalDateTime createdDate;
+ 
     
+    /* ================= ROUTE ASSIGNMENT USING ROUTE CODE ================= */
+  
     @ManyToOne
-    @JoinColumn(name = "route_id", nullable = false)
+    @JoinColumn(name = "route_id", nullable = false) 
     private RouteWay route;
-   
+
 
     private Boolean gpsEnabled;
 
-	public void setRoute(RouteWay route) {
-
-		
-	}
-
-	public RouteWay getRoute() {
-	
-		return null;
-	}
-   
-  
+ 
 }
