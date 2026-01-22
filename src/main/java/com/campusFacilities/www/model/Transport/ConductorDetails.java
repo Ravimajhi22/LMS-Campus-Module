@@ -1,5 +1,4 @@
 package com.campusFacilities.www.model.Transport;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -56,14 +55,6 @@ public class ConductorDetails {
 	    @Column(nullable = false)
 	    private Boolean active = true;
 
-		public Object getName() {
-			
-			return null;
-		}
-
-		public void setName(Object name) {
-			// TODO Auto-generated method stub
-			
-		}
+		
 	}
 

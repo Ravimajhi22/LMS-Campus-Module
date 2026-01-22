@@ -76,7 +76,7 @@ public class TransportService {
         return vehicleRepository.save(vehicle);
     }
 
-    //GET ALL VEHICE
+    //=======================GET ALL VEHICE==============================//
     
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
@@ -208,12 +208,68 @@ public class TransportService {
         existing.setContactNumber(driver.getContactNumber());
         return driverDetailsRepository.save(existing);
     }
+    public DriverDetails patchDriver(Long driverId, DriverDetails updates) {
+
+        DriverDetails existing = driverDetailsRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (updates.getName() != null)
+            existing.setName(updates.getName());
+
+        if (updates.getContactNumber() != null)
+            existing.setContactNumber(updates.getContactNumber());
+
+        if (updates.getLicenseNumber() != null)
+            existing.setLicenseNumber(updates.getLicenseNumber());
+
+        if (updates.getLicenseExpiryDate() != null)
+            existing.setLicenseExpiryDate(updates.getLicenseExpiryDate());
+
+        if (updates.getRole() != null)
+            existing.setRole(updates.getRole());
+
+        if (updates.getExperienceCategory() != null)
+            existing.setExperienceCategory(updates.getExperienceCategory());
+
+        if (updates.getExperienceYears() != null)
+            existing.setExperienceYears(updates.getExperienceYears());
+
+        if (updates.getShift() != null)
+            existing.setShift(updates.getShift());
+
+        if (updates.getBackgroundVerified() != null)
+            existing.setBackgroundVerified(updates.getBackgroundVerified());
+
+        if (updates.getLicenseValidityStatus() != null)
+            existing.setLicenseValidityStatus(updates.getLicenseValidityStatus());
+
+        if (updates.getVerificationStatus() != null)
+            existing.setVerificationStatus(updates.getVerificationStatus());
+
+        if (updates.getActive() != null)
+            existing.setActive(updates.getActive());
+
+        if (updates.getVehicle() != null && updates.getVehicle().getId() != null)
+            existing.setVehicle(
+                vehicleRepository.findById(updates.getVehicle().getId())
+                    .orElseThrow(() -> new RuntimeException("Vehicle not found"))
+            );
+
+        if (updates.getRoute() != null && updates.getRoute().getId() != null)
+            existing.setRoute(
+                routeWayRepository.findById(updates.getRoute().getId())
+                    .orElseThrow(() -> new RuntimeException("Route not found"))
+            );
+
+        return driverDetailsRepository.save(existing);
+    }
+
 
     public void deleteDriver(Long driverId) {
         driverDetailsRepository.deleteById(driverId);
     }
 
-    /* ================= CONDUCTOR ================= */
+    /* ================= CONDUCTOR DETAILS ================= */
 
     public ConductorDetails addConductor(ConductorDetails conductor) {
         conductor.setActive(true);
@@ -234,18 +290,63 @@ public class TransportService {
     }
 
     public ConductorDetails updateConductor(Long conductorId, ConductorDetails conductor) {
+
         ConductorDetails existing = getConductorById(conductorId);
-        existing.setName(conductor.getName());
+
+        existing.setConductorName(conductor.getConductorName());
         existing.setContactNumber(conductor.getContactNumber());
+        existing.setExperienceYears(conductor.getExperienceYears());
+        existing.setVerificationStatus(conductor.getVerificationStatus());
+        existing.setActive(conductor.getActive());
+
+        if (conductor.getRoute() != null && conductor.getRoute().getId() != null) {
+            RouteWay route = routeWayRepository.findById(conductor.getRoute().getId())
+                    .orElseThrow(() -> new RuntimeException("Route not found"));
+            existing.setRoute(route);
+        }
+
+        if (conductor.getVehicle() != null && conductor.getVehicle().getId() != null) {
+            Vehicle vehicle = vehicleRepository.findById(conductor.getVehicle().getId())
+                    .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+            existing.setVehicle(vehicle);
+        }
+
+        return conductorRepository.save(existing);
+    }
+    public ConductorDetails patchConductor(Long conductorId, ConductorDetails conductor) {
+
+        ConductorDetails existing = getConductorById(conductorId);
+
+        if (conductor.getConductorName() != null)
+            existing.setConductorName(conductor.getConductorName());
+
+        if (conductor.getContactNumber() != null)
+            existing.setContactNumber(conductor.getContactNumber());
+
+        if (conductor.getExperienceYears() != null)
+            existing.setExperienceYears(conductor.getExperienceYears());
+
+        if (conductor.getVerificationStatus() != null)
+            existing.setVerificationStatus(conductor.getVerificationStatus());
+
+        if (conductor.getActive() != null)
+            existing.setActive(conductor.getActive());
+
+        if (conductor.getRoute() != null && conductor.getRoute().getId() != null) {
+            RouteWay route = routeWayRepository.findById(conductor.getRoute().getId())
+                    .orElseThrow(() -> new RuntimeException("Route not found"));
+            existing.setRoute(route);
+        }
+
+        if (conductor.getVehicle() != null && conductor.getVehicle().getId() != null) {
+            Vehicle vehicle = vehicleRepository.findById(conductor.getVehicle().getId())
+                    .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+            existing.setVehicle(vehicle);
+        }
+
         return conductorRepository.save(existing);
     }
 
-    public ConductorDetails patchConductor(Long conductorId, ConductorDetails conductor) {
-        ConductorDetails existing = getConductorById(conductorId);
-        if (conductor.getActive() != null)
-            existing.setActive(conductor.getActive());
-        return conductorRepository.save(existing);
-    }
 
     public void deleteConductor(Long conductorId) {
         conductorRepository.deleteById(conductorId);

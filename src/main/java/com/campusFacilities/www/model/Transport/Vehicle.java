@@ -60,7 +60,6 @@ public class Vehicle {
     @Column(name = "created_date", updatable = false, nullable = false)
     private LocalDateTime createdDate;
  
-    
     /* ================= ROUTE ASSIGNMENT USING ROUTE CODE ================= */
   
     @ManyToOne

@@ -35,7 +35,7 @@ public class TransportController {
     private TransportService transportService;
 
         /* =====================================================
-                              * VEHICLE
+                              VEHICLE
          * ===================================================== */
 
     @PreAuthorize("hasAuthority('VEHICLE_ADD')")
@@ -159,7 +159,18 @@ public class TransportController {
             @RequestBody DriverDetails driver) {
         return ResponseEntity.ok(transportService.updateDriver(driverId, driver));
     }
+    
+    @PreAuthorize("hasAuthority('DRIVER_UPDATE')")
+    @PatchMapping("/drivers/{driverId}")
+    public ResponseEntity<DriverDetails> patchDriver(
+            @PathVariable Long driverId,
+            @RequestBody DriverDetails driver) {
 
+        return ResponseEntity.ok(
+                transportService.patchDriver(driverId, driver)
+        );
+    }
+    
     @PreAuthorize("hasAuthority('DRIVER_DELETE')")
     @DeleteMapping("/drivers/{driverId}")
     public ResponseEntity<String> deleteDriver(@PathVariable Long driverId) {
@@ -228,7 +239,6 @@ public class TransportController {
                 transportService.patchConductor(conductorId, conductor));
     }
 
-
     @PreAuthorize("hasAuthority('CONDUCTOR_DELETE')")
     @DeleteMapping("/conductors/{conductorId}")
     public ResponseEntity<String> deleteConductor(
@@ -249,10 +259,15 @@ public class TransportController {
         }
 
         @PreAuthorize("hasAuthority('GPS_VIEW')")
-        @GetMapping("/gps/latest/{busId}")
-        public ResponseEntity<VehicleGPS> getLatestLocation(@PathVariable Long busId) {
-            return ResponseEntity.ok(transportService.getLatestLocation(busId));
+        @GetMapping("/gps/latest/{vehicleId}")
+        public ResponseEntity<VehicleGPS> getLatestLocation(
+                @PathVariable Long vehicleId) {
+
+            return ResponseEntity.ok(
+                    transportService.getLatestLocation(vehicleId));
         }
+
+
 
         /* =====================================================
                            TRANSPORT ATTENDANCE

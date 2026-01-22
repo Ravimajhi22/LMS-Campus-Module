@@ -30,8 +30,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
+        if (authHeader != null
+                && authHeader.startsWith("Bearer ")
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
             String token = authHeader.substring(7);
 
             try {
@@ -41,7 +42,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         .parseClaimsJws(token)
                         .getBody();
 
+                @SuppressWarnings("unchecked")
                 List<String> roles = claims.get("roles", List.class);
+
+                @SuppressWarnings("unchecked")
                 List<String> permissions = claims.get("permissions", List.class);
 
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -69,6 +73,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         .setAuthentication(authentication);
 
             } catch (Exception e) {
+            	e.printStackTrace();
                 SecurityContextHolder.clearContext();
             }
         }
