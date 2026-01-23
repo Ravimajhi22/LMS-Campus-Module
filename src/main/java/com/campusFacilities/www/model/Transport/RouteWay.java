@@ -48,7 +48,6 @@ public class RouteWay
     
     private Integer estimatedTimeMinutes;
     
-    private Integer MaxStudents;
 
     /* =============VEHICLES ASSIGNED TO THIS ROUTE =========*/
   

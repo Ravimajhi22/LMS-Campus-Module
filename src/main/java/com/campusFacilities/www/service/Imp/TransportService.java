@@ -2,14 +2,15 @@ package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
+import com.campusFacilities.www.model.Transport.QRAttendanceRequest;
 import com.campusFacilities.www.model.Transport.RouteWay;
 import com.campusFacilities.www.model.Transport.TransportAttendance;
+import com.campusFacilities.www.model.Transport.TransportAttendance.MarkedBy;
+import com.campusFacilities.www.model.Transport.TransportAttendance.TransportAttendanceStatus;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
 import com.campusFacilities.www.repository.Transport.ConductorDetailsRepository;
@@ -19,21 +20,18 @@ import com.campusFacilities.www.repository.Transport.TransportAttendanceReposito
 import com.campusFacilities.www.repository.Transport.VehicleGPSRepository;
 import com.campusFacilities.www.repository.Transport.VehicleRepository;
 
-
 @Service
 public class TransportService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
     
-   
     @Autowired
     private RouteWayRepository routeWayRepository;    
     
     @Autowired
     private  DriverDetailsRepository driverDetailsRepository;
     
-
     @Autowired
     private ConductorDetailsRepository conductorRepository;
     
@@ -76,7 +74,6 @@ public class TransportService {
         return vehicleRepository.save(vehicle);
     }
 
-    //=======================GET ALL VEHICE==============================//
     
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
@@ -131,7 +128,7 @@ public class TransportService {
         vehicleRepository.delete(getVehicleByNumber(vehicleNumber));
     }
 
-    /* ================= ROUTE ================= */
+    /* ================================ ROUTEWAY ======================================== */
 
     public RouteWay addRoute(RouteWay routeWay) {
         routeWay.setActive(routeWay.getActive() == null ? true : routeWay.getActive());
@@ -160,7 +157,6 @@ public class TransportService {
         existing.setDropPoints(routeWay.getDropPoints());
         existing.setDistanceKm(routeWay.getDistanceKm());
         existing.setEstimatedTimeMinutes(routeWay.getEstimatedTimeMinutes());
-        existing.setMaxStudents(routeWay.getMaxStudents());
         existing.setActive(routeWay.getActive());
 
         return routeWayRepository.save(existing);
@@ -182,7 +178,7 @@ public class TransportService {
         routeWayRepository.delete(getRouteByCode(routeCode));
     }
 
-    /* ================= DRIVER DETAILS =================== */
+    /* ============================== DRIVER DETAILS ========================================== */
 
     public DriverDetails addDriver(DriverDetails driver) {
         driver.setActive(true);
@@ -268,8 +264,7 @@ public class TransportService {
     public void deleteDriver(Long driverId) {
         driverDetailsRepository.deleteById(driverId);
     }
-
-    /* ================= CONDUCTOR DETAILS ================= */
+    /* ================================== CONDUCTOR DETAILS ======================================== */
 
     public ConductorDetails addConductor(ConductorDetails conductor) {
         conductor.setActive(true);
@@ -352,28 +347,42 @@ public class TransportService {
         conductorRepository.deleteById(conductorId);
     }
 
-    /* ================= GPS ================= */
+    /* ================================== VEHICLE GPS =================================== */
 
     public VehicleGPS saveLocation(VehicleGPS gps) {
         gps.setTimestamp(LocalDateTime.now());
         return gpsRepository.save(gps);
     }
 
-
     public VehicleGPS getLatestLocation(Long vehicleId) {
         return gpsRepository
                 .findTopByVehicle_IdOrderByTimestampDesc(vehicleId)
                 .orElse(null);
     }
-    /* ================= ATTENDANCE ================= */
+    /* ============================== TRANSPORT ATTENDANCE ===================================== */
 
-    public TransportAttendance markAttendance(TransportAttendance attendance) {
-        return attendanceRepository.save(attendance);
+    public void markAttendanceByQR(QRAttendanceRequest req)
+    {
+
+        TransportAttendance attendance = new TransportAttendance();
+
+        attendance.setStudentId(req.getStudentId());
+        attendance.setVehicle(
+            vehicleRepository.findById(req.getVehicleId()).orElseThrow()
+        );
+        attendance.setRoute(
+            routeWayRepository.findById(req.getRouteId()).orElseThrow()
+        );
+
+        attendance.setAttendanceDate(LocalDate.now());
+        attendance.setMarkedBy(MarkedBy.QR);
+     
+        if ("PICKUP".equals(req.getSession())) {
+            attendance.setPickupStatus(TransportAttendanceStatus.PICKED_UP);
+        } else {
+            attendance.setDropStatus(TransportAttendanceStatus.DROPPED);
+        }
+        
+       attendanceRepository.save(attendance);
     }
-
-    public List<TransportAttendance> getBusAttendance(Long vehicleId, LocalDate date) {
-        return attendanceRepository
-                .findByVehicle_IdAndAttendanceDate(vehicleId, date);
-    }
-
 }

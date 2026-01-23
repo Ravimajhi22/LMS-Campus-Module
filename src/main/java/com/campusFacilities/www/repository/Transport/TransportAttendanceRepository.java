@@ -31,5 +31,16 @@ public interface TransportAttendanceRepository
     // Attendance by date
     List<TransportAttendance>
     findByAttendanceDate(LocalDate attendanceDate);
+    
+    boolean existsByStudentIdAndAttendanceDate(
+            Long studentId,
+            LocalDate attendanceDate
+    );
+
+    boolean existsByStudentIdAndAttendanceDateAndMarkedBy(
+            Long studentId,
+            LocalDate attendanceDate,
+            TransportAttendance.MarkedBy markedBy
+    );
 
 }

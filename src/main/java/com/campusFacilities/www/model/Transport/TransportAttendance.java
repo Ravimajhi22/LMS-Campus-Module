@@ -41,14 +41,7 @@ import lombok.Data;
 	    /* ================= DATE ================= */
 	    private LocalDate attendanceDate;
 
-	    @Enumerated(EnumType.STRING)
-	    private AttendanceStatus status;
-	    
-	    public enum AttendanceStatus {
-	        PRESENT,
-	        ABSENT,
-	        SKIPPED
-	    }
+	   
 	    @Enumerated(EnumType.STRING)
 	    private MarkedBy markedBy;
 	    
@@ -71,5 +64,11 @@ import lombok.Data;
 
 	    @Enumerated(EnumType.STRING)
 	    private TransportAttendanceStatus dropStatus;
+
+
+		public void save(TransportAttendance attendance) {
+			
+			
+		}
 	}
 

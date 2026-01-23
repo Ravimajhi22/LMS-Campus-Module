@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.campusFacilities.www.Transport.Config.QRCodeUtil;
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
+import com.campusFacilities.www.model.Transport.QRAttendanceRequest;
 import com.campusFacilities.www.model.Transport.RouteWay;
-import com.campusFacilities.www.model.Transport.TransportAttendance;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
 import com.campusFacilities.www.service.Imp.TransportService;
@@ -179,7 +180,7 @@ public class TransportController {
     }
 
 
-        /* =====================================================
+        /* ===================================================== *
                           CONDUCTOR DETAILS
          * ===================================================== */
 
@@ -249,7 +250,7 @@ public class TransportController {
     }
 
         /* =====================================================
-                         VEHICLE GPS
+                                VEHICLE GPS
          * ===================================================== */
 
         @PreAuthorize("hasAuthority('GPS_ADD')")
@@ -266,25 +267,41 @@ public class TransportController {
             return ResponseEntity.ok(
                     transportService.getLatestLocation(vehicleId));
         }
-
-
-
+        
         /* =====================================================
                            TRANSPORT ATTENDANCE
          * ===================================================== */
 
-        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_ADD')")
-        @PostMapping("/attendance")
-        public ResponseEntity<TransportAttendance> markAttendance(
-                @RequestBody TransportAttendance attendance) {
-            return ResponseEntity.ok(transportService.markAttendance(attendance));
+        @PostMapping("/transport/attendance/qr/mark")
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
+        public ResponseEntity<String> markAttendanceByQR(
+                @RequestBody QRAttendanceRequest req
+        ) {
+            transportService.markAttendanceByQR(req);
+            return ResponseEntity.ok("Attendance marked successfully via QR");
+        }
+        
+        @GetMapping("/transport/attendance/qr")
+        @PreAuthorize("hasRole('INSTRUCTOR')")
+        public ResponseEntity<byte[]> generateQR(
+                @RequestParam Long vehicleId,
+                @RequestParam Long routeId,
+                @RequestParam String session
+        ) throws Exception {
+
+            String qrData = String.format(
+                "{\"vehicleId\":%d,\"routeId\":%d,\"date\":\"%s\",\"session\":\"%s\"}",
+                vehicleId,
+                routeId,
+                LocalDate.now(),
+                session
+            );
+
+            byte[] qr = QRCodeUtil.generateQR(qrData);
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .body(qr);
         }
 
-        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
-        @GetMapping("/attendance/bus")
-        public ResponseEntity<List<TransportAttendance>> getBusAttendance(
-                @RequestParam Long busId,
-                @RequestParam LocalDate date) {
-            return ResponseEntity.ok(transportService.getBusAttendance(busId, date));
-        }
+
 }
