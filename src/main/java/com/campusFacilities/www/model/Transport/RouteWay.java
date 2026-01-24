@@ -2,6 +2,8 @@ package com.campusFacilities.www.model.Transport;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -52,6 +54,7 @@ public class RouteWay
     /* =============VEHICLES ASSIGNED TO THIS ROUTE =========*/
   
     @OneToMany(mappedBy = "route")
+    @JsonIgnore
     private List<Vehicle> vehicles;
 
     
