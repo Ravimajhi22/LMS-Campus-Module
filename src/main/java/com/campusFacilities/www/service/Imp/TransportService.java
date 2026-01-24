@@ -200,7 +200,7 @@ public class TransportService {
 
     public DriverDetails updateDriver(Long driverId, DriverDetails driver) {
         DriverDetails existing = getDriverById(driverId);
-        existing.setName(driver.getName());
+        existing.setFullname(driver.getFullname());
         existing.setContactNumber(driver.getContactNumber());
         return driverDetailsRepository.save(existing);
     }
@@ -209,8 +209,8 @@ public class TransportService {
         DriverDetails existing = driverDetailsRepository.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
 
-        if (updates.getName() != null)
-            existing.setName(updates.getName());
+        if (updates.getFullname() != null)
+            existing.setFullname(updates.getFullname());
 
         if (updates.getContactNumber() != null)
             existing.setContactNumber(updates.getContactNumber());
@@ -375,7 +375,7 @@ public class TransportService {
         );
 
         attendance.setAttendanceDate(LocalDate.now());
-        attendance.setMarkedBy(MarkedBy.QR);
+        attendance.setMarkedBy(MarkedBy.QRCODE);
      
         if ("PICKUP".equals(req.getSession())) {
             attendance.setPickupStatus(TransportAttendanceStatus.PICKED_UP);

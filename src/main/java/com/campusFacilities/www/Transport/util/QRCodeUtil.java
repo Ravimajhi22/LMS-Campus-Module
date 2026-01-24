@@ -1,4 +1,4 @@
-package com.campusFacilities.www.Transport.Config;
+package com.campusFacilities.www.Transport.util;
 import java.io.ByteArrayOutputStream;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;

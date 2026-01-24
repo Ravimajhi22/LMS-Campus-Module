@@ -52,8 +52,8 @@ public class Vehicle {
     public enum VehicleStatus
     {
 	    ACTIVE,
-	    INACTIVE,
-	    DEACTIVE
+	    MAINTENANCE,
+	    INACTIVE
 	}
    
     @CreationTimestamp
@@ -63,7 +63,7 @@ public class Vehicle {
     /* ================= ROUTE ASSIGNMENT USING ROUTE CODE ================= */
   
     @ManyToOne
-    @JoinColumn(name = "route_id", nullable = false) 
+    @JoinColumn(name = "route_id", nullable = true) 
     private RouteWay route;
 
 

@@ -40,15 +40,13 @@ import lombok.Data;
 
 	    /* ================= DATE ================= */
 	    private LocalDate attendanceDate;
-
 	   
 	    @Enumerated(EnumType.STRING)
 	    private MarkedBy markedBy;
 	    
 	    public enum MarkedBy {
 	        MANUAL,
-	        QR,
-	        GPS
+	        QRCODE
 	    }
 
 	    @Enumerated(EnumType.STRING)

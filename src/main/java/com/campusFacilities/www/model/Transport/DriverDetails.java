@@ -24,7 +24,7 @@ public class DriverDetails
 	
 	
 	    @Column(nullable = false)
-	    private String name;
+	    private String Fullname;
         
 	    @Column(nullable = false, unique = true)
 	    private String contactNumber;
@@ -98,6 +98,11 @@ public class DriverDetails
 	    @ManyToOne
 	    @JoinColumn(name = "conductor_id") 
 	    private ConductorDetails conductor;
+
+		public String getFullname() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	    
 	}
 

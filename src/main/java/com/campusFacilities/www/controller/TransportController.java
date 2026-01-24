@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campusFacilities.www.Transport.Config.QRCodeUtil;
+import com.campusFacilities.www.Transport.util.QRCodeUtil;
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
 import com.campusFacilities.www.model.Transport.QRAttendanceRequest;
@@ -271,32 +271,34 @@ public class TransportController {
         /* =====================================================
                            TRANSPORT ATTENDANCE
          * ===================================================== */
-
-        @PostMapping("/transport/attendance/qr/mark")
+        
+        @PostMapping("/attendance/qr/mark")
         @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
         public ResponseEntity<String> markAttendanceByQR(
                 @RequestBody QRAttendanceRequest req
-        ) {
+        ) 
+        {
             transportService.markAttendanceByQR(req);
             return ResponseEntity.ok("Attendance marked successfully via QR");
         }
         
-        @GetMapping("/transport/attendance/qr")
-        @PreAuthorize("hasRole('INSTRUCTOR')")
-        public ResponseEntity<byte[]> generateQR(
+        @GetMapping("/attendance/qr")
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
+        public ResponseEntity<byte[]> generateQR
+        (
                 @RequestParam Long vehicleId,
                 @RequestParam Long routeId,
                 @RequestParam String session
-        ) throws Exception {
-
+                                           )
+        		throws Exception 
+        {
             String qrData = String.format(
                 "{\"vehicleId\":%d,\"routeId\":%d,\"date\":\"%s\",\"session\":\"%s\"}",
                 vehicleId,
                 routeId,
                 LocalDate.now(),
-                session
-            );
-
+                session);
+            
             byte[] qr = QRCodeUtil.generateQR(qrData);
             return ResponseEntity.ok()
                     .header("Content-Type", "image/png")
