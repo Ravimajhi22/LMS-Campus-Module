@@ -2,7 +2,7 @@ package com.campusFacilities.www.model.Transport;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -26,9 +26,9 @@ import lombok.NoArgsConstructor;
 public class RouteWay 
 
 {
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
     
     @Column(name = "route_Code")
     private Long routeCode;
@@ -52,11 +52,9 @@ public class RouteWay
     
 
     /* =============VEHICLES ASSIGNED TO THIS ROUTE =========*/
-  
     @OneToMany(mappedBy = "route")
-    @JsonIgnore
+    @JsonManagedReference
     private List<Vehicle> vehicles;
-
     
     @Column(nullable = false)
     private Boolean active = true;

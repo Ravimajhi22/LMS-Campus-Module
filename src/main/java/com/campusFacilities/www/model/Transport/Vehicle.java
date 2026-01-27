@@ -1,10 +1,7 @@
 package com.campusFacilities.www.model.Transport;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,11 +59,11 @@ public class Vehicle {
     @Column(name = "created_date", updatable = false, nullable = false)
     private LocalDateTime createdDate;
  
-    /* ================= ROUTE ASSIGNMENT USING ROUTE CODE ================= */
+    /* ================= ROUTE ASSIGNMENT USING ROUTE_ID ================= */
   
     @ManyToOne
-    @JoinColumn(name = "route_id", nullable = true)
-    @JsonIgnore
+    @JoinColumn(name = "route_id")
+    @JsonBackReference
     private RouteWay route;
 
 

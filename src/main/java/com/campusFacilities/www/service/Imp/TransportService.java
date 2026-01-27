@@ -1,9 +1,12 @@
 package com.campusFacilities.www.service.Imp;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
 import com.campusFacilities.www.model.Transport.QRAttendanceRequest;
@@ -25,41 +28,39 @@ public class TransportService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
-    
+
     @Autowired
-    private RouteWayRepository routeWayRepository;    
-    
+    private RouteWayRepository routeWayRepository;
+
     @Autowired
-    private  DriverDetailsRepository driverDetailsRepository;
-    
+    private DriverDetailsRepository driverDetailsRepository;
+
     @Autowired
     private ConductorDetailsRepository conductorRepository;
-    
+
     @Autowired
     private VehicleGPSRepository gpsRepository;
 
     @Autowired
     private TransportAttendanceRepository attendanceRepository;
-    
+
     /* ================= VEHICLE ===================== */
 
     public Vehicle addVehicle(Vehicle vehicle) {
 
-        if (vehicle == null) 
-        {
+        if (vehicle == null) {
             throw new IllegalArgumentException("Vehicle must not be null");
         }
 
-        if (vehicle.getRoute() == null || vehicle.getRoute().getRouteCode() == null) 
-        {
-            throw new IllegalArgumentException("Route code is required");
+        if (vehicle.getRoute() == null || vehicle.getRoute().getId() == null) {
+            throw new IllegalArgumentException("Route ID is required");
         }
 
-		  RouteWay route = routeWayRepository
-		  .findByRouteCode(vehicle.getRoute().getRouteCode()) .orElseThrow(() -> new
-		  RuntimeException("Route not found"));
-		  
-		vehicle.setRoute(route);
+        RouteWay route = routeWayRepository.findById(vehicle.getRoute().getId())
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+
+        vehicle.setRoute(route);
+
         vehicle.setOccupiedSeats(
                 vehicle.getOccupiedSeats() == null ? 0 : vehicle.getOccupiedSeats());
 
@@ -74,13 +75,17 @@ public class TransportService {
         return vehicleRepository.save(vehicle);
     }
 
-    
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
     public Vehicle getVehicleByNumber(String vehicleNumber) {
         return vehicleRepository.findByVehicleNumber(vehicleNumber)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+    }
+
+    public Vehicle getVehicleById(Long id) {
+        return vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
     }
 
@@ -94,15 +99,32 @@ public class TransportService {
         existing.setVehicleStatus(vehicle.getVehicleStatus());
         existing.setGpsEnabled(vehicle.getGpsEnabled());
 
-        if (vehicle.getRoute() != null) {
+        if (vehicle.getRoute() != null && vehicle.getRoute().getId() != null) {
+
             RouteWay route = routeWayRepository
-                    .findByRouteCode(vehicle.getRoute().getRouteCode())
+                    .findById(vehicle.getRoute().getId())
                     .orElseThrow(() -> new RuntimeException("Route not found"));
 
             existing.setRoute(route);
         }
+        return vehicleRepository.save(existing);
+    }
 
+    public Vehicle updateVehicleById(Long id, Vehicle vehicle) {
+        Vehicle existing = getVehicleById(id);
+        existing.setVehicleNumber(vehicle.getVehicleNumber());
+        existing.setVehicletype(vehicle.getVehicletype());
+        existing.setCapacity(vehicle.getCapacity());
+        existing.setOccupiedSeats(vehicle.getOccupiedSeats());
+        existing.setVehicleStatus(vehicle.getVehicleStatus());
+        existing.setGpsEnabled(vehicle.getGpsEnabled());
 
+        if (vehicle.getRoute() != null && vehicle.getRoute().getId() != null) {
+            RouteWay route = routeWayRepository
+                    .findById(vehicle.getRoute().getId())
+                    .orElseThrow(() -> new RuntimeException("Route not found"));
+            existing.setRoute(route);
+        }
         return vehicleRepository.save(existing);
     }
 
@@ -124,11 +146,35 @@ public class TransportService {
         return vehicleRepository.save(existing);
     }
 
+    public Vehicle patchVehicleById(Long id, Vehicle vehicle) {
+        Vehicle existing = getVehicleById(id);
+
+        if (vehicle.getVehicleNumber() != null)
+            existing.setVehicleNumber(vehicle.getVehicleNumber());
+        if (vehicle.getVehicletype() != null)
+            existing.setVehicletype(vehicle.getVehicletype());
+        if (vehicle.getCapacity() != null)
+            existing.setCapacity(vehicle.getCapacity());
+        if (vehicle.getOccupiedSeats() != null)
+            existing.setOccupiedSeats(vehicle.getOccupiedSeats());
+        if (vehicle.getVehicleStatus() != null)
+            existing.setVehicleStatus(vehicle.getVehicleStatus());
+        if (vehicle.getGpsEnabled() != null)
+            existing.setGpsEnabled(vehicle.getGpsEnabled());
+
+        return vehicleRepository.save(existing);
+    }
+
     public void deleteVehicle(String vehicleNumber) {
         vehicleRepository.delete(getVehicleByNumber(vehicleNumber));
     }
 
-    /* ================================ ROUTEWAY ======================================== */
+    public void deleteVehicleById(Long id) {
+        vehicleRepository.deleteById(id);
+    }
+
+    // ================================ ROUTEWAY
+    // ======================================== //
 
     public RouteWay addRoute(RouteWay routeWay) {
         routeWay.setActive(routeWay.getActive() == null ? true : routeWay.getActive());
@@ -178,7 +224,10 @@ public class TransportService {
         routeWayRepository.delete(getRouteByCode(routeCode));
     }
 
-    /* ============================== DRIVER DETAILS ========================================== */
+    /*
+     * ============================== DRIVER DETAILS
+     * ==========================================
+     */
 
     public DriverDetails addDriver(DriverDetails driver) {
         driver.setActive(true);
@@ -204,6 +253,7 @@ public class TransportService {
         existing.setContactNumber(driver.getContactNumber());
         return driverDetailsRepository.save(existing);
     }
+
     public DriverDetails patchDriver(Long driverId, DriverDetails updates) {
 
         DriverDetails existing = driverDetailsRepository.findById(driverId)
@@ -247,24 +297,24 @@ public class TransportService {
 
         if (updates.getVehicle() != null && updates.getVehicle().getId() != null)
             existing.setVehicle(
-                vehicleRepository.findById(updates.getVehicle().getId())
-                    .orElseThrow(() -> new RuntimeException("Vehicle not found"))
-            );
+                    vehicleRepository.findById(updates.getVehicle().getId())
+                            .orElseThrow(() -> new RuntimeException("Vehicle not found")));
 
         if (updates.getRoute() != null && updates.getRoute().getId() != null)
             existing.setRoute(
-                routeWayRepository.findById(updates.getRoute().getId())
-                    .orElseThrow(() -> new RuntimeException("Route not found"))
-            );
+                    routeWayRepository.findById(updates.getRoute().getId())
+                            .orElseThrow(() -> new RuntimeException("Route not found")));
 
         return driverDetailsRepository.save(existing);
     }
 
-
     public void deleteDriver(Long driverId) {
         driverDetailsRepository.deleteById(driverId);
     }
-    /* ================================== CONDUCTOR DETAILS ======================================== */
+    /*
+     * ================================== CONDUCTOR DETAILS
+     * ========================================
+     */
 
     public ConductorDetails addConductor(ConductorDetails conductor) {
         conductor.setActive(true);
@@ -308,6 +358,7 @@ public class TransportService {
 
         return conductorRepository.save(existing);
     }
+
     public ConductorDetails patchConductor(Long conductorId, ConductorDetails conductor) {
 
         ConductorDetails existing = getConductorById(conductorId);
@@ -342,12 +393,14 @@ public class TransportService {
         return conductorRepository.save(existing);
     }
 
-
     public void deleteConductor(Long conductorId) {
         conductorRepository.deleteById(conductorId);
     }
 
-    /* ================================== VEHICLE GPS =================================== */
+    /*
+     * ================================== VEHICLE GPS
+     * ===================================
+     */
 
     public VehicleGPS saveLocation(VehicleGPS gps) {
         gps.setTimestamp(LocalDateTime.now());
@@ -359,30 +412,30 @@ public class TransportService {
                 .findTopByVehicle_IdOrderByTimestampDesc(vehicleId)
                 .orElse(null);
     }
-    /* ============================== TRANSPORT ATTENDANCE ===================================== */
+    /*
+     * ============================== TRANSPORT ATTENDANCE
+     * =====================================
+     */
 
-    public void markAttendanceByQR(QRAttendanceRequest req)
-    {
+    public void markAttendanceByQR(QRAttendanceRequest req) {
 
         TransportAttendance attendance = new TransportAttendance();
 
         attendance.setStudentId(req.getStudentId());
         attendance.setVehicle(
-            vehicleRepository.findById(req.getVehicleId()).orElseThrow()
-        );
+                vehicleRepository.findById(req.getVehicleId()).orElseThrow());
         attendance.setRoute(
-            routeWayRepository.findById(req.getRouteId()).orElseThrow()
-        );
+                routeWayRepository.findById(req.getRouteId()).orElseThrow());
 
         attendance.setAttendanceDate(LocalDate.now());
         attendance.setMarkedBy(MarkedBy.QRCODE);
-     
+
         if ("PICKUP".equals(req.getSession())) {
             attendance.setPickupStatus(TransportAttendanceStatus.PICKED_UP);
         } else {
             attendance.setDropStatus(TransportAttendanceStatus.DROPPED);
         }
-        
-       attendanceRepository.save(attendance);
+
+        attendanceRepository.save(attendance);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.ConductorDetails.ConductorVerificationStatus;
+import com.campusFacilities.www.model.Transport.Vehicle;
 
 @Repository
 public interface ConductorDetailsRepository
@@ -18,4 +19,6 @@ public interface ConductorDetailsRepository
     
     
     List<ConductorDetails> findByRoute_Id(Long routeId);
+
+	List<ConductorDetails> findByVehicle(Vehicle vehicle);
 }

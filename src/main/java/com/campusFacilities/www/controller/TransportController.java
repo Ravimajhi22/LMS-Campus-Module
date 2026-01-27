@@ -1,4 +1,5 @@
 package com.campusFacilities.www.controller;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,54 +36,66 @@ public class TransportController {
     @Autowired
     private TransportService transportService;
 
-        /* =====================================================
-                              VEHICLE
-         * ===================================================== */
+    /*
+     * =====================================================
+     * VEHICLE
+     * =====================================================
+     */
 
-    @PreAuthorize("hasAuthority('VEHICLE_ADD')")
+    // @PreAuthorize("hasAuthority('VEHICLE_ADD')")
     @PostMapping("/vehicles")
     public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
         return ResponseEntity.ok(transportService.addVehicle(vehicle));
     }
 
-    @PreAuthorize("hasAuthority('VEHICLE_VIEW')")
+    // @PreAuthorize("hasAuthority('VEHICLE_VIEW')")
     @GetMapping("/vehicles")
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
         return ResponseEntity.ok(transportService.getAllVehicles());
     }
 
-    @PreAuthorize("hasAuthority('VEHICLE_VIEW')")
-    @GetMapping("/vehicles/{vehicleNumber}")
-    public ResponseEntity<Vehicle> getVehicleByNumber(@PathVariable String vehicleNumber) {
-        return ResponseEntity.ok(transportService.getVehicleByNumber(vehicleNumber));
+    // @PreAuthorize("hasAuthority('VEHICLE_VIEW')")
+    @GetMapping("/vehicles/{id}")
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
+        return ResponseEntity.ok(transportService.getVehicleById(id));
     }
 
-    @PreAuthorize("hasAuthority('VEHICLE_UPDATE')")
-    @PutMapping("/vehicles/{vehicleNumber}")
+    // @PreAuthorize("hasAuthority('VEHICLE_UPDATE')")
+    @PutMapping("/vehicles/{id}")
     public ResponseEntity<Vehicle> updateVehicle(
-            @PathVariable String vehicleNumber,
+            @PathVariable Long id,
             @RequestBody Vehicle vehicle) {
-        return ResponseEntity.ok(transportService.updateVehicle(vehicleNumber, vehicle));
+        return ResponseEntity.ok(transportService.updateVehicleById(id, vehicle));
     }
 
-    @PreAuthorize("hasAuthority('VEHICLE_UPDATE')")
-    @PatchMapping("/vehicles/{vehicleNumber}")
+    // @PreAuthorize("hasAuthority('VEHICLE_UPDATE')")
+    @PatchMapping("/vehicles/{id}")
     public ResponseEntity<Vehicle> patchVehicle(
-            @PathVariable String vehicleNumber,
+            @PathVariable Long id,
             @RequestBody Vehicle vehicle) {
-        return ResponseEntity.ok(transportService.patchVehicle(vehicleNumber, vehicle));
+        return ResponseEntity.ok(transportService.patchVehicleById(id, vehicle));
     }
 
-    @PreAuthorize("hasAuthority('VEHICLE_DELETE')")
-    @DeleteMapping("/vehicles/{vehicleNumber}")
-    public ResponseEntity<String> deleteVehicle(@PathVariable String vehicleNumber) {
-        transportService.deleteVehicle(vehicleNumber);
+    // @PreAuthorize("hasAuthority('VEHICLE_DELETE')") // TEMPORARILY COMMENTED OUT
+    @DeleteMapping("/vehicles/{id}")
+    public ResponseEntity<String> deleteVehicle(@PathVariable Long id) {
+        transportService.deleteVehicleById(id);
         return ResponseEntity.ok("Vehicle deleted successfully");
     }
 
-        /* =====================================================
-                                 ROUTEWAY
-         * ===================================================== */
+    /*
+     * @PreAuthorize("hasAuthority('VEHICLE_DELETE')")
+     * 
+     * @DeleteMapping("/vehicles/{vehicleNumber}") public ResponseEntity<String>
+     * deleteVehicle(@PathVariable String vehicleNumber) {
+     * transportService.deleteVehicle(vehicleNumber); return
+     * ResponseEntity.ok("Vehicle deleted successfully"); }
+     * 
+     */ /*
+         * =====================================================
+         * ROUTEWAY
+         * =====================================================
+         */
 
     @PreAuthorize("hasAuthority('ROUTE_ADD')")
     @PostMapping("/routes")
@@ -131,9 +144,11 @@ public class TransportController {
         return ResponseEntity.ok("Route deleted successfully");
     }
 
-        /* =====================================================
-                            DRIVER DETAILS
-         * ===================================================== */
+    /*
+     * =====================================================
+     * DRIVER DETAILS
+     * =====================================================
+     */
 
     @PreAuthorize("hasAuthority('DRIVER_ADD')")
     @PostMapping("/drivers")
@@ -160,7 +175,7 @@ public class TransportController {
             @RequestBody DriverDetails driver) {
         return ResponseEntity.ok(transportService.updateDriver(driverId, driver));
     }
-    
+
     @PreAuthorize("hasAuthority('DRIVER_UPDATE')")
     @PatchMapping("/drivers/{driverId}")
     public ResponseEntity<DriverDetails> patchDriver(
@@ -168,10 +183,9 @@ public class TransportController {
             @RequestBody DriverDetails driver) {
 
         return ResponseEntity.ok(
-                transportService.patchDriver(driverId, driver)
-        );
+                transportService.patchDriver(driverId, driver));
     }
-    
+
     @PreAuthorize("hasAuthority('DRIVER_DELETE')")
     @DeleteMapping("/drivers/{driverId}")
     public ResponseEntity<String> deleteDriver(@PathVariable Long driverId) {
@@ -179,10 +193,11 @@ public class TransportController {
         return ResponseEntity.ok("Driver deleted successfully");
     }
 
-
-        /* ===================================================== *
-                          CONDUCTOR DETAILS
-         * ===================================================== */
+    /*
+     * ===================================================== *
+     * CONDUCTOR DETAILS
+     * =====================================================
+     */
 
     @PreAuthorize("hasAuthority('CONDUCTOR_ADD')")
     @PostMapping("/conductors")
@@ -192,7 +207,6 @@ public class TransportController {
         return ResponseEntity.ok(
                 transportService.addConductor(conductor));
     }
-
 
     @PreAuthorize("hasAuthority('CONDUCTOR_VIEW')")
     @GetMapping("/conductors")
@@ -229,7 +243,6 @@ public class TransportController {
                 transportService.updateConductor(conductorId, conductor));
     }
 
-
     @PreAuthorize("hasAuthority('CONDUCTOR_UPDATE')")
     @PatchMapping("/conductors/{conductorId}")
     public ResponseEntity<ConductorDetails> patchConductor(
@@ -249,61 +262,59 @@ public class TransportController {
         return ResponseEntity.ok("Conductor deleted successfully");
     }
 
-        /* =====================================================
-                                VEHICLE GPS
-         * ===================================================== */
+    /*
+     * =====================================================
+     * VEHICLE GPS
+     * =====================================================
+     */
 
-        @PreAuthorize("hasAuthority('GPS_ADD')")
-        @PostMapping("/gps")
-        public ResponseEntity<VehicleGPS> saveLocation(@RequestBody VehicleGPS gps) {
-            return ResponseEntity.ok(transportService.saveLocation(gps));
-        }
+    @PreAuthorize("hasAuthority('GPS_ADD')")
+    @PostMapping("/gps")
+    public ResponseEntity<VehicleGPS> saveLocation(@RequestBody VehicleGPS gps) {
+        return ResponseEntity.ok(transportService.saveLocation(gps));
+    }
 
-        @PreAuthorize("hasAuthority('GPS_VIEW')")
-        @GetMapping("/gps/latest/{vehicleId}")
-        public ResponseEntity<VehicleGPS> getLatestLocation(
-                @PathVariable Long vehicleId) {
+    @PreAuthorize("hasAuthority('GPS_VIEW')")
+    @GetMapping("/gps/latest/{vehicleId}")
+    public ResponseEntity<VehicleGPS> getLatestLocation(
+            @PathVariable Long vehicleId) {
 
-            return ResponseEntity.ok(
-                    transportService.getLatestLocation(vehicleId));
-        }
-        
-        /* =====================================================
-                           TRANSPORT ATTENDANCE
-         * ===================================================== */
-        
-        @PostMapping("/attendance/qr/mark")
-        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
-        public ResponseEntity<String> markAttendanceByQR(
-                @RequestBody QRAttendanceRequest req
-        ) 
-        {
-            transportService.markAttendanceByQR(req);
-            return ResponseEntity.ok("Attendance marked successfully via QR");
-        }
-        
-        @GetMapping("/attendance/qr")
-        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
-        public ResponseEntity<byte[]> generateQR
-        (
-                @RequestParam Long vehicleId,
-                @RequestParam Long routeId,
-                @RequestParam String session
-                                           )
-        		throws Exception 
-        {
-            String qrData = String.format(
+        return ResponseEntity.ok(
+                transportService.getLatestLocation(vehicleId));
+    }
+
+    /*
+     * =====================================================
+     * TRANSPORT ATTENDANCE
+     * =====================================================
+     */
+
+    @PostMapping("/attendance/qr/mark")
+    @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
+    public ResponseEntity<String> markAttendanceByQR(
+            @RequestBody QRAttendanceRequest req) {
+        transportService.markAttendanceByQR(req);
+        return ResponseEntity.ok("Attendance marked successfully via QR");
+    }
+
+    @GetMapping("/attendance/qr")
+    @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
+    public ResponseEntity<byte[]> generateQR(
+            @RequestParam Long vehicleId,
+            @RequestParam Long routeId,
+            @RequestParam String session)
+            throws Exception {
+        String qrData = String.format(
                 "{\"vehicleId\":%d,\"routeId\":%d,\"date\":\"%s\",\"session\":\"%s\"}",
                 vehicleId,
                 routeId,
                 LocalDate.now(),
                 session);
-            
-            byte[] qr = QRCodeUtil.generateQR(qrData);
-            return ResponseEntity.ok()
-                    .header("Content-Type", "image/png")
-                    .body(qr);
-        }
 
+        byte[] qr = QRCodeUtil.generateQR(qrData);
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(qr);
+    }
 
 }

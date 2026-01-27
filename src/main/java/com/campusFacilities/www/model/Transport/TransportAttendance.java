@@ -1,7 +1,5 @@
 package com.campusFacilities.www.model.Transport;
-
 import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

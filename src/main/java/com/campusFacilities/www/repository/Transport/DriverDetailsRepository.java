@@ -25,4 +25,7 @@ public interface DriverDetailsRepository extends JpaRepository<DriverDetails, Lo
 
     List<DriverDetails> findByRoute_Id(Long routeId);
     
+    List<DriverDetails> findByVehicle(com.campusFacilities.www.model.Transport.Vehicle vehicle); 
+    
 }
+    
