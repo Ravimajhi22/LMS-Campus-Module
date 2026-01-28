@@ -1,12 +1,11 @@
 package com.campusFacilities.www.repository.Transport;
-
 import java.time.LocalDate;
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import com.campusFacilities.www.model.Transport.TransportAttendance;
+import com.campusFacilities.www.model.Transport.Vehicle;
 
 @Repository
 public interface TransportAttendanceRepository
@@ -42,5 +41,9 @@ public interface TransportAttendanceRepository
             LocalDate attendanceDate,
             TransportAttendance.MarkedBy markedBy
     );
+
+    Optional<TransportAttendance> findByStudentIdAndVehicleAndAttendanceDate(
+    	    Long studentId, Vehicle vehicle, LocalDate date
+    	);
 
 }

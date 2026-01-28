@@ -1,8 +1,11 @@
 package com.campusFacilities.www.model.Transport;
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,17 +29,13 @@ import lombok.Data;
 
 	    /* ================= VEHICLE (BY VEHICLE NUMBER) ================= */
 	   
-	    @ManyToOne
-	    @JoinColumn(name = "vehicle_id", nullable = false) // FK → Vehicle.id
+	    @ManyToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "vehicle_id", nullable = false) 
 	    private Vehicle vehicle;
 
-	    /* ================= ROUTE (BY ROUTE CODE) ================= */
-	   
-	    @ManyToOne
-	    @JoinColumn(name = "route_id", nullable = false) // FK → RouteWay.id
-	    private RouteWay route;
 
 	    /* ================= DATE ================= */
+	    @Column(name = "attendance_date", nullable = false)
 	    private LocalDate attendanceDate;
 	   
 	    @Enumerated(EnumType.STRING)
@@ -64,6 +63,12 @@ import lombok.Data;
 
 		public void save(TransportAttendance attendance) {
 			
+			
+		}
+
+
+		public void setRoute(RouteWay orElseThrow) {
+			// TODO Auto-generated method stub
 			
 		}
 	}

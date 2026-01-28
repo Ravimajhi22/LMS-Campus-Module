@@ -1,7 +1,6 @@
 package com.campusFacilities.www.model.Transport;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,14 +13,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "Vehicles")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Vehicle {
+public class Vehicle 
+{
 
 	
     @Id
@@ -59,11 +61,12 @@ public class Vehicle {
     @Column(name = "created_date", updatable = false, nullable = false)
     private LocalDateTime createdDate;
  
-    /* ================= ROUTE ASSIGNMENT USING ROUTE_ID ================= */
+    /* ================= ROUTE ASSIGNMENT USING ROUTE CODE ================= */
   
     @ManyToOne
-    @JoinColumn(name = "route_id")
-    @JsonBackReference
+    @JoinColumn(name = "route_id", nullable = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private RouteWay route;
 
 

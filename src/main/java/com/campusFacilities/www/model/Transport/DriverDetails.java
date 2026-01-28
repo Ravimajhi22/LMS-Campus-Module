@@ -1,5 +1,4 @@
 package com.campusFacilities.www.model.Transport;
-
 import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,91 +15,94 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "drivers")
-public class DriverDetails {
+public class DriverDetails 
+{
+	
+	    @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long driverId;
+	
+	
+	    @Column(name = "fullname", nullable = false)
+	    private String fullName;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long driverId;
+        
+	    @Column(nullable = false, unique = true)
+	    private String contactNumber;
+	    
+	    @Column(nullable = false, unique = true)
+	    private String licenseNumber;
 
-	@Column(nullable = false)
-	private String Fullname;
+	    @Column(nullable = false)
+	    private LocalDate licenseExpiryDate;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private Role role;
+	    public enum Role
+	    {
+	    	DRIVER, CONDUCTOR ,HELPER
+	    }
+	    
+	    @Enumerated(EnumType.STRING)
+	    private ExperienceCategory experienceCategory;
+	    public enum ExperienceCategory
+	    {
+	    	SCHOOLBUS, HEAVYVEHICLE, LIGHTVEHICLE ,BOTHSCHOOLBUSANDHEAVYVEHICLE
+	    }
+	   
+	    @Column(nullable = false)
+	    private Boolean backgroundVerified = false;
 
-	@Column(nullable = false, unique = true)
-	private String contactNumber;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private ShiftType shift;
+	    
+	    public enum ShiftType {
+             MORNING, EVENING ,BOTH }
+	    
+	    @Column(nullable = false)
+	    private Integer experienceYears;
+	    
+	    @Enumerated(EnumType.STRING)
+	    private LicenseValidityStatus licenseValidityStatus;
 
-	@Column(nullable = false, unique = true)
-	private String licenseNumber;
+	    public enum LicenseValidityStatus {
+	        VALID,
+	        EXPIRED,
+	        EXPIRINGSOON
+	    }
+	 
+	    @Enumerated(EnumType.STRING)
+	    @Column(nullable = false)
+	   
+	    private DriverStatus verificationStatus;
+	   
+	    public enum DriverStatus {
+	        PENDING,
+	        VERIFIED,
+	        SUSPENDED,
+	        REJECTED
+	    }
+	    
+	    @Column(nullable = false)
+	    private Boolean active = true;
+	    
+	    /* ================= VEHICLE ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "vehicle_id")
+	    private Vehicle vehicle;
 
-	@Column(nullable = false)
-	private LocalDate licenseExpiryDate;
+	    /* ================= ROUTE ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "route_id") 
+	    private RouteWay route;
 
-	@Enumerated(EnumType.STRING)
-	private Role role;
+	    /* ================= CONDUCTOR ASSIGNMENT ================= */
+	    @ManyToOne
+	    @JoinColumn(name = "conductor_id") 
+	    private ConductorDetails conductor;
 
-	public enum Role {
-		DRIVER, CONDUCTOR, HELPER
+
+	    
 	}
 
-	@Enumerated(EnumType.STRING)
-	private ExperienceCategory experienceCategory;
-
-	public enum ExperienceCategory {
-		SCHOOLBUS, HEAVYVEHICLE, LIGHTVEHICLE, BOTHSCHOOLBUSANDHEAVYVEHICLE
-	}
-
-	private Boolean backgroundVerified;
-
-	@Enumerated(EnumType.STRING)
-	private ShiftType shift;
-
-	public enum ShiftType {
-		MORNING, EVENING, BOTH
-	}
-
-	@Column(nullable = false)
-	private Integer experienceYears;
-
-	@Enumerated(EnumType.STRING)
-	private LicenseValidityStatus licenseValidityStatus;
-
-	public enum LicenseValidityStatus {
-		VALID,
-		EXPIRED,
-		EXPIRINGSOON
-	}
-
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-
-	private DriverStatus verificationStatus;
-
-	public enum DriverStatus {
-		PENDING,
-		VERIFIED,
-		SUSPENDED,
-		REJECTED
-	}
-
-	@Column(nullable = false)
-	private Boolean active = true;
-
-	/* ================= VEHICLE ASSIGNMENT ================= */
-	@ManyToOne
-	@JoinColumn(name = "vehicle_id")
-	private Vehicle vehicle;
-
-	/* ================= ROUTE ASSIGNMENT ================= */
-	@ManyToOne
-	@JoinColumn(name = "route_id")
-	private RouteWay route;
-
-	/* ================= CONDUCTOR ASSIGNMENT ================= */
-	@ManyToOne
-	@JoinColumn(name = "conductor_id")
-	private ConductorDetails conductor;
-
-	public String getFullname() {
-		return this.Fullname;
-	}
-
-}
