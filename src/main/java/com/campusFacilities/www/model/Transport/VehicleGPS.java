@@ -18,9 +18,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VehicleGPS {
-	
-
+public class VehicleGPS 
+{
 		@Id
       	@GeneratedValue(strategy = GenerationType.IDENTITY)
       	private Long id;
@@ -32,7 +31,7 @@ public class VehicleGPS {
 		private Vehicle vehicle;
 
 
-	    /* ================= LOCATION ================= */
+	    /* =================== LOCATION ================= */
 	  
 	    @Column(nullable = false)
 	    private double latitude;

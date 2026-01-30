@@ -1,6 +1,9 @@
 package com.campusFacilities.www.model.Hostel;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,12 +22,15 @@ public class StudentHostelAllocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long allocationId;
+    
+    @Column(nullable = false)
+    private Long studentId;
 
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "user_id", nullable = false) private User user;
-	 */
+    private String studentName;
+    private String studentEmail;
+    
+    private String fatherName;
+    private String fatherPhone;
     
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
@@ -42,8 +48,28 @@ public class StudentHostelAllocation {
         CHECKED_OUT,
         CANCELLED
     }
+    
+    @Column(nullable = false)
+    private BigDecimal monthlyFee;      
 
-	/*
-	 * @CreationTimestamp private Timestamp createdAt;
-	 */
+    @Column(nullable = false)
+    private BigDecimal totalFee;       
+
+    @Column(nullable = false)
+    private BigDecimal amountPaid = BigDecimal.ZERO;  
+
+    @Column(nullable = false)
+    private BigDecimal dueAmount;     
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus = PaymentStatus.DUE; 
+
+    public enum PaymentStatus 
+    {
+        PAID,
+        DUE
+    }
+
+    private LocalDate lastPaymentDate;
+
 }

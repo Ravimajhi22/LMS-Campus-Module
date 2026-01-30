@@ -1,14 +1,11 @@
 package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.campusFacilities.www.Transport.util.QRCodeUtil;
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
@@ -360,7 +357,6 @@ public class TransportService {
     //================================== VEHICLE GPS =================================== */
 
     public VehicleGPS saveLocation(VehicleGPS gps) {
-        gps.setTimestamp(LocalDateTime.now());
         return gpsRepository.save(gps);
     }
 
@@ -384,7 +380,7 @@ public class TransportService {
         return QRCodeUtil.generateQRCode(qrText);
     }
 
-    // 🔹 Scan QR and Mark Attendance
+    // Scan QR and Mark Attendance
     public TransportAttendance markAttendance(Long studentId, String qrText) {
 
         Map<String, String> qrData = parseQRText(qrText);
@@ -419,7 +415,7 @@ public class TransportService {
         return attendanceRepository.save(attendance);
     }
 
-    // 🔹 QR Text Parser
+    // QR Text Parser
     
     private Map<String, String> parseQRText(String qrText) {
         Map<String, String> map = new HashMap<>();

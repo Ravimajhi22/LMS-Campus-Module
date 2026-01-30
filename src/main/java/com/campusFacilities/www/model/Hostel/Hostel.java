@@ -25,15 +25,29 @@ public class Hostel {
 
     @Enumerated(EnumType.STRING)
     private HostelType hostelType; 
+    public enum HostelType 
+    {
+        MEN,
+        WOMEN,
+        COLIVING
+    }
 
     private Integer totalBlocks = 0;
+    
     private Integer totalRooms = 0;
+    
     private String wardenName;
+    
     private String contactNumber;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
-
+    public enum Status 
+    {
+        ACTIVE,
+        INACTIVE
+    }
+    
     private Boolean isDeleted = false;
 
     @CreationTimestamp
@@ -42,18 +56,7 @@ public class Hostel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public enum HostelType 
-    {
-        BOYS,
-        GIRLS,
-        MIXED
-    }
 
-    public enum Status 
-    {
-        ACTIVE,
-        INACTIVE
-    }
 }
 
 

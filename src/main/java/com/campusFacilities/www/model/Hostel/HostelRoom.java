@@ -1,5 +1,4 @@
 package com.campusFacilities.www.model.Hostel;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,13 +6,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
-       @Entity
+     @Entity
 	@Table(name = "hostel_rooms", uniqueConstraints = {@UniqueConstraint(columnNames = {"block_id","room_number"})})
 	@Data
        public class HostelRoom {
@@ -21,36 +18,41 @@ import lombok.Data;
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long roomId;
 
-	    @ManyToOne
-	    @JoinColumn(name = "block_id", nullable = false)
-	    private HostelBlock block;
-
-	    private Integer floorNumber;
-	    
-	    @Column(nullable = false)
+	 
+	    @Column(name = "room_number", nullable = false)
 	    private String roomNumber;
-
+	    
+	   
 	    @Enumerated(EnumType.STRING)
-	    private RoomType roomType; 
+	    @Column(name = "sharing_type", nullable = false)
+	    private SharingType sharingType;
+	    
+	    public enum SharingType {
+	        SINGLE,   // 1 bed
+	        DOUBLE,   // 2 beds
+	        TRIPLE,   // 3 beds
+	        QUAD      // 4 beds
+	    }
 
-	    private Integer capacity;
-	    private Integer occupiedCount = 0;
 
 	    @Enumerated(EnumType.STRING)
 	    private RoomStatus status = RoomStatus.AVAILABLE;
 
-	    private Boolean isDeleted = false;
-	    
-	    public enum RoomType {
-	        SINGLE,
-	        DOUBLE,
-	        TRIPLE
-	    }
-
 	    public enum RoomStatus {
 	        AVAILABLE,
-	        FULL,
-	        MAINTENANCE
+	        PARTIALLY_FILLED,
+	        FULL
 	    }
+	    // ---------- AUTO CALCULATED ----------
+	    @Column(name = "currently_occupied", nullable = false)
+	    private int currentlyOccupied = 0;
+
+	    @Column(name = "is_deleted")
+	    private Boolean isDeleted = false;
+
+	  
+
+
+	    
 	}
 
