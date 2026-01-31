@@ -30,4 +30,6 @@ public class MessDayMenu {
     private String breakfast;
     private String lunch;
     private String dinner;
+
+	
 }

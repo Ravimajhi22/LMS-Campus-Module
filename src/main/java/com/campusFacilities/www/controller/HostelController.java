@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -55,6 +57,16 @@ public class HostelController {
     public ResponseEntity<Hostel> getHostelById(@PathVariable Long id) {
         return ResponseEntity.ok(hostelService.getHostelById(id));
     }
+    
+    //PUT Method
+    @PreAuthorize("hasAuthority('HOSTEL_UPDATE')")
+    @PutMapping("/hostel/{id}")
+    public ResponseEntity<Hostel> updateHostel(
+            @PathVariable Long id,
+            @RequestBody Hostel hostel) {
+        return ResponseEntity.ok(hostelService.updateHostel(id, hostel));
+    }
+
 
     // PATCH (PARTIAL UPDATE)
     @PreAuthorize("hasAuthority('HOSTEL_UPDATE')")
@@ -104,6 +116,16 @@ public class HostelController {
             @RequestBody HostelRoom room) {
         return ResponseEntity.ok(hostelService.updateRoomPartial(id, room));
     }
+ // PUT (FULL UPDATE)
+    @PreAuthorize("hasAuthority('HOSTEL_ROOM_UPDATE')")
+    @PutMapping("/rooms/{id}")
+    public ResponseEntity<HostelRoom> updateRoom(
+            @PathVariable Long id,
+            @RequestBody HostelRoom room) {
+
+        return ResponseEntity.ok(hostelService.updateRoom(id, room));
+    }
+
 
     // PATCH STATUS
     @PreAuthorize("hasAuthority('HOSTEL_ROOM_STATUS_UPDATE')")
@@ -158,7 +180,7 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.updateAttendancePartial(id, attendance));
     }
-
+ 
     //  DELETE ATTENDANCE
     @PreAuthorize("hasAuthority('HOSTEL_ATTENDANCE_DELETE')")
     @DeleteMapping("/attendance/{id}")
@@ -172,7 +194,7 @@ public class HostelController {
     
     //CREATE COMPLAINT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_CREATE')")
-    @PostMapping
+    @PostMapping("/complaint")
     public ResponseEntity<HostelComplaint> createComplaint(
             @RequestBody HostelComplaint complaint) {
         return ResponseEntity.ok(hostelService.createComplaint(complaint));
@@ -197,6 +219,17 @@ public class HostelController {
         		hostelService.getComplaintById(id));
     }
 
+ // PUT – FULL UPDATE COMPLAINT
+    @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_UPDATE')")
+    @PutMapping("/complaint/{id}")
+    public ResponseEntity<HostelComplaint> updateComplaintFull(
+            @PathVariable Long id,
+            @RequestBody HostelComplaint complaint) {
+
+        return ResponseEntity.ok(
+                hostelService.updateComplaintFull(id, complaint)
+        );
+    }
     // PATCH – UPDATE STATUS / REMARKS (ADMIN)
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_STATUS_UPDATE')")
     @PatchMapping("/complaint/{id}")
@@ -230,14 +263,14 @@ public class HostelController {
 
     // GET ALL MENUS
     @PreAuthorize("hasAuthority('MESS_MENU_VIEW')")
-    @GetMapping("/mess-menu")
+    @GetMapping("/mess-menus")
     public ResponseEntity<List<MessDayMenu>> getAllMenus() {
         return ResponseEntity.ok(hostelService.getAllMenus());
     }
 
     // GET MENU BY ID
     @PreAuthorize("hasAuthority('MESS_MENU_VIEW')")
-    @GetMapping("/mess-menu/{id}")
+    @GetMapping("/mess-menus/{id}")
     public ResponseEntity<MessDayMenu> getMenuById(@PathVariable Long id) {
         return ResponseEntity.ok(hostelService.getMenuById(id));
     }
@@ -250,6 +283,15 @@ public class HostelController {
             @RequestBody MessDayMenu menu) {
         return ResponseEntity.ok(
         		hostelService.updateMenuPartial(id, menu));
+    }
+ // PUT (FULL UPDATE)
+    @PreAuthorize("hasAuthority('MESS_MENU_UPDATE')")
+    @PutMapping("/mess-menu/{id}")
+    public ResponseEntity<MessDayMenu> updateMenuFull(
+            @PathVariable Long id,
+            @RequestBody MessDayMenu menu) {
+
+        return ResponseEntity.ok(hostelService.updateMenu(id, menu));
     }
 
     // DELETE MENU
@@ -297,6 +339,19 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.updateIncident(id, status, clinicalNotes));
     }
+     // PUT – FULL UPDATE HEALTH INCIDENT
+    
+    @PreAuthorize("hasAuthority('HOSTEL_HEALTH_INCIDENT_UPDATE')")
+    @PutMapping("/health/{id}")
+    public ResponseEntity<StudentHealthIncident> updateIncidentFull(
+            @PathVariable Long id,
+            @RequestBody StudentHealthIncident incident) {
+
+        return ResponseEntity.ok(
+                hostelService.updateIncidentFull(id, incident)
+        );
+    }
+
 
     // DELETE (SOFT DELETE)
     @PreAuthorize("hasAuthority('HOSTEL_HEALTH_INCIDENT_DELETE')")
@@ -305,7 +360,7 @@ public class HostelController {
     	hostelService.deleteIncident(id);
         return ResponseEntity.ok("Health incident deleted successfully");
     }
-    // ================= StudentHosteAllocation ====================//
+    // ================= StudentHostelAllocation ====================//
         
         
  // CREATE ALLOCATION
@@ -365,6 +420,27 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.updatePayment(id, amountPaid, paymentDate));
     }
+       // PUT – FULL UPDATE ALLOCATION
+    @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_UPDATE')")
+    @PutMapping("/allocations/{id}")
+    public ResponseEntity<StudentHostelAllocation> updateAllocation(
+            @PathVariable Long id,
+            @RequestBody StudentHostelAllocation allocation) {
+
+        return ResponseEntity.ok(
+                hostelService.updateAllocation(id, allocation));
+    }
+    
+ // DELETE – SOFT DELETE ALLOCATION
+    @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_DELETE')")
+    @DeleteMapping("/allocations/{id}")
+    public ResponseEntity<String> deleteAllocation(@PathVariable Long id) {
+
+        hostelService.deleteAllocation(id);
+        return ResponseEntity.ok("Allocation deleted successfully");
+    }
+
+
     //=======================================StudentVisitEntryController====================//
     
     // CREATE VISIT (STUDENT)
@@ -404,6 +480,17 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.updateVisitStatus(id, status));
     }
+ // PUT – UPDATE VISIT (FULL UPDATE)
+    @PreAuthorize("hasAuthority('HOSTEL_VISIT_UPDATE')")
+    @PutMapping("/visits/{id}")
+    public ResponseEntity<StudentVisitEntry> updateVisit(
+            @PathVariable Long id,
+            @RequestBody StudentVisitEntry visit) {
+
+        return ResponseEntity.ok(
+                hostelService.updateVisit(id, visit));
+    }
+
 
     //  DELETE VISIT
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_DELETE')")

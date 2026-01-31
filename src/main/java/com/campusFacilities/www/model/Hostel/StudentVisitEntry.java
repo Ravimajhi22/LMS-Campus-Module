@@ -31,7 +31,7 @@ public class StudentVisitEntry {
 	    private String visitorName;
 
 	    @Enumerated(EnumType.STRING)
-	    @Column(nullable = false)
+	    @Column(nullable = true)
 	    private Relationship relationship;
 
 	    @Column(name = "visitor_contact", nullable = false)

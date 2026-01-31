@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -36,11 +35,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (authHeader != null
                 && authHeader.startsWith("Bearer ")
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String token = authHeader.substring(7);
+        	 String token = authHeader
+        	            .replace("Bearer", "")
+        	            .trim()
+        	            .replaceAll("\\s+", "");
+
 
             try {
+               
+            	Keys.hmacShaKeyFor(jwtSecret.getBytes())
+
+                ;
+
                 Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+                        .setSigningKey(
+                                Keys.hmacShaKeyFor(jwtSecret.getBytes())
+                        )
                         .build()
                         .parseClaimsJws(token)
                         .getBody();

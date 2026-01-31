@@ -10,8 +10,5 @@ import com.campusFacilities.www.model.Hostel.HostelAttendance;
 
 @Repository
 public interface HostelAttendanceRepository extends JpaRepository<HostelAttendance, Long> {
-
-    List<HostelAttendance> findByAttendanceDate(LocalDate date);
-
-    List<HostelAttendance> findByStudentId(Long studentId);
-}
+    List<HostelAttendance> findByAttendanceDate(LocalDate attendanceDate);
+    }

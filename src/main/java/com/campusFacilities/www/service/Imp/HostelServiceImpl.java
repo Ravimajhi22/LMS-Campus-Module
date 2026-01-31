@@ -2,8 +2,10 @@ package com.campusFacilities.www.service.Imp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -71,6 +73,23 @@ public class HostelServiceImpl {
                 .filter(h -> !Boolean.TRUE.equals(h.getIsDeleted()))
                 .orElseThrow(() -> new RuntimeException("Hostel not found"));
     }
+    
+    //PUT Method
+    public Hostel updateHostel(Long id, Hostel hostel) {
+
+        Hostel existingHostel = hostelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hostel not found"));
+
+        existingHostel.setHostelName(hostel.getHostelName());
+        existingHostel.setWardenName(hostel.getWardenName());
+        existingHostel.setContactNumber(hostel.getContactNumber());
+        existingHostel.setHostelType(hostel.getHostelType());
+        existingHostel.setTotalBlocks(hostel.getTotalBlocks());
+        existingHostel.setTotalRooms(hostel.getTotalRooms());
+        existingHostel.setStatus(hostel.getStatus());
+
+        return hostelRepository.save(existingHostel);
+    }
 
     // PATCH (PARTIAL UPDATE)
     public Hostel updateHostelPartial(Long hostelId, Hostel request) {
@@ -111,6 +130,7 @@ public class HostelServiceImpl {
     public HostelAttendance markAttendance(HostelAttendance attendance) {
         return hostelAttedanceRepository.save(attendance);
     }
+    
 
     // GET ALL ATTENDANCE (OPTIONAL FILTER BY DATE)
     public List<HostelAttendance> getAllAttendance(LocalDate date) {
@@ -125,7 +145,7 @@ public class HostelServiceImpl {
         return hostelAttedanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new RuntimeException("Attendance not found"));
     }
-
+  
     // PATCH (PARTIAL UPDATE)
     public HostelAttendance updateAttendancePartial(Long attendanceId, HostelAttendance request) {
         HostelAttendance attendance = getAttendanceById(attendanceId);
@@ -142,15 +162,16 @@ public class HostelServiceImpl {
     }
 
 //====================HostelComplaints===============================//
-   //CREATE COMPLAINT
+  
+    //CREATE COMPLAINT
      public HostelComplaint addComplaint(HostelComplaint complaint) {
     complaint.setReportedDate(LocalDate.now());
     complaint.setStatus(HostelComplaint.ComplaintStatus.OPEN);
     return hostelComplaintRepository.save(complaint);
 }
 
-// GET ALL COMPLAINTS (OPTIONAL FILTER BY STATUS)
-public List<HostelComplaint> getAllComplaints(
+    // GET ALL COMPLAINTS (OPTIONAL FILTER BY STATUS)
+   public List<HostelComplaint> getAllComplaints(
         HostelComplaint.ComplaintStatus status) {
 
     if (status != null) {
@@ -163,6 +184,29 @@ public List<HostelComplaint> getAllComplaints(
 public HostelComplaint getComplaintById(Long complaintId) {
     return hostelComplaintRepository.findById(complaintId)
             .orElseThrow(() -> new RuntimeException("Complaint not found"));
+}
+public HostelComplaint updateComplaintFull(Long id, HostelComplaint updated) {
+
+    HostelComplaint existing = complaintRepository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Complaint not found with id: " + id));
+
+    // -------- STUDENT INFO --------
+    existing.setStudentId(updated.getStudentId());
+    existing.setStudentName(updated.getStudentName());
+    existing.setStudentEmail(updated.getStudentEmail());
+    existing.setStudentPhone(updated.getStudentPhone());
+
+  
+    // -------- COMPLAINT DETAILS --------
+    existing.setIssueCategory(updated.getIssueCategory());
+    existing.setPriority(updated.getPriority());
+    existing.setDescription(updated.getDescription());
+    existing.setReportedDate(updated.getReportedDate());
+    existing.setStatus(updated.getStatus());
+    existing.setAdminRemarks(updated.getAdminRemarks());
+
+    return complaintRepository.save(existing);
 }
 
 // PATCH – UPDATE STATUS / ADMIN REMARKS ONLY
@@ -226,6 +270,24 @@ public void deleteComplaint(Long complaintId) {
         return hostelRoomRepository.save(room);
     }
 
+    //Put 
+    public HostelRoom updateRoom(Long id, HostelRoom room) {
+
+        HostelRoom existingRoom = hostelRoomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // REQUIRED FIELDS
+        existingRoom.setRoomNumber(room.getRoomNumber());
+        existingRoom.setSharingType(room.getSharingType());
+        existingRoom.setStatus(room.getStatus());
+
+        // OPTIONAL FIELDS (safe updates)
+        existingRoom.setCurrentlyOccupied(room.getCurrentlyOccupied());
+        existingRoom.setIsDeleted(room.getIsDeleted());
+
+        return hostelRoomRepository.save(existingRoom);
+    }
+    
     // SOFT DELETE
     public void deleteRoom(Long roomId) {
         HostelRoom room = getRoomById(roomId);
@@ -254,6 +316,20 @@ public void deleteComplaint(Long complaintId) {
                 .orElseThrow(() -> new RuntimeException("Menu not found"));
     }
 
+    //PUT 
+    public MessDayMenu updateMenu(Long id, MessDayMenu menu) {
+
+        MessDayMenu existingMenu = messDayMenuRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mess menu not found"));
+
+        // FULL UPDATE
+        existingMenu.setDay(menu.getDay());
+        existingMenu.setBreakfast(menu.getBreakfast());
+        existingMenu.setLunch(menu.getLunch());
+        existingMenu.setDinner(menu.getDinner());
+
+        return messDayMenuRepository.save(existingMenu);
+    }
     // PATCH (PARTIAL UPDATE)
     public MessDayMenu updateMenuPartial(Long menuId, MessDayMenu request) {
         MessDayMenu menu = getMenuById(menuId);
@@ -313,6 +389,30 @@ public void deleteComplaint(Long complaintId) {
             incident.setClinicalNotes(clinicalNotes);
 
         return incidentRepository.save(incident);
+    }
+    //Put method
+    public StudentHealthIncident updateIncidentFull(
+            Long id,
+            StudentHealthIncident updated) {
+
+        StudentHealthIncident existing = getIncidentById(id);
+
+        existing.setStudentId(updated.getStudentId());
+        existing.setStudentName(updated.getStudentName());
+        existing.setStudentPhone(updated.getStudentPhone());
+        existing.setParentPhone(updated.getParentPhone());
+
+        existing.setComplaintNature(updated.getComplaintNature());
+        existing.setSeverity(updated.getSeverity());
+        existing.setCurrentStatus(updated.getCurrentStatus());
+        existing.setReportedDate(updated.getReportedDate());
+        existing.setClinicalNotes(updated.getClinicalNotes());
+
+        // hostel & room (important)
+        existing.setHostel(updated.getHostel());
+        existing.setRoom(updated.getRoom());
+
+        return incidentRepository.save(existing);
     }
 
     // SOFT DELETE
@@ -396,6 +496,41 @@ public StudentHostelAllocation updatePayment(
 
     return allocationRepository.save(allocation);
 }
+ 
+      //Put Method
+    public StudentHostelAllocation updateAllocation(Long id, StudentHostelAllocation allocation) {
+
+        StudentHostelAllocation existing = allocationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Allocation not found"));
+
+        existing.setStudentName(allocation.getStudentName());
+        existing.setStudentEmail(allocation.getStudentEmail());
+        existing.setFatherName(allocation.getFatherName());
+        existing.setFatherPhone(allocation.getFatherPhone());
+        existing.setRoom(allocation.getRoom());
+        existing.setJoinDate(allocation.getJoinDate());
+        existing.setLeaveDate(allocation.getLeaveDate());
+        existing.setMonthlyFee(allocation.getMonthlyFee());
+        existing.setTotalFee(allocation.getTotalFee());
+        existing.setAmountPaid(allocation.getAmountPaid());
+        existing.setDueAmount(allocation.getDueAmount());
+        existing.setPaymentStatus(allocation.getPaymentStatus());
+        existing.setLastPaymentDate(allocation.getLastPaymentDate());
+        existing.setStatus(allocation.getStatus());
+
+        return allocationRepository.save(existing);
+        
+    }
+    public void deleteAllocation(Long id) {
+
+        StudentHostelAllocation allocation = allocationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Allocation not found"));
+
+        allocation.setStatus(StudentHostelAllocation.AllocationStatus.CANCELLED);
+        allocation.setLeaveDate(LocalDate.now());
+
+        allocationRepository.save(allocation);
+    }
 
     // ================= Hostel complaints =================
 
@@ -475,6 +610,27 @@ public StudentHostelAllocation updatePayment(
             StudentVisitEntry visit = getVisitById(visitId);
             visit.setStatus(status);
             return visitRepository.save(visit);
+        }
+        
+        public StudentVisitEntry updateVisit(Long id, StudentVisitEntry visit) {
+
+            StudentVisitEntry existing = visitRepository.findById(id)
+                    .orElseThrow(() ->
+                            new RuntimeException("Visit entry not found with id: " + id));
+
+            // -------- FULL UPDATE --------
+            existing.setStudentId(visit.getStudentId());
+            existing.setStudentName(visit.getStudentName());
+            existing.setVisitorName(visit.getVisitorName());
+    
+            existing.setVisitorContact(visit.getVisitorContact());
+            existing.setPurposeOfVisit(visit.getPurposeOfVisit());
+            existing.setVisitDate(visit.getVisitDate());
+            existing.setVisitTime(visit.getVisitTime());
+            existing.setVisitTime(visit.getVisitTime());
+            existing.setStatus(visit.getStatus());
+
+            return visitRepository.save(existing);
         }
 
         // DELETE VISIT ENTRY (RARE / SUPER ADMIN)
