@@ -32,67 +32,69 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null
-                && authHeader.startsWith("Bearer ")
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-        	 String token = authHeader
-        	            .replace("Bearer", "")
-        	            .trim()
-        	            .replaceAll("\\s+", "");
+    
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        
+        String token = authHeader.substring(7).trim();
 
-            try {
-               
-            	Keys.hmacShaKeyFor(jwtSecret.getBytes())
+        if (token.isEmpty() || token.chars().filter(ch -> ch == '.').count() != 2) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                ;
+        
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(
-                                Keys.hmacShaKeyFor(jwtSecret.getBytes())
-                        )
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-                @SuppressWarnings("unchecked")
-                List<String> roles = claims.get("roles", List.class);
+            @SuppressWarnings("unchecked")
+            List<String> roles = claims.get("roles", List.class);
 
-                @SuppressWarnings("unchecked")
-                List<String> permissions = claims.get("permissions", List.class);
+            @SuppressWarnings("unchecked")
+            List<String> permissions = claims.get("permissions", List.class);
 
-                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-                if (roles != null) {
-                    roles.forEach(role ->
+            if (roles != null) {
+                roles.forEach(role ->
                         authorities.add(new SimpleGrantedAuthority(role))
-                    );
-                }
-
-                if (permissions != null) {
-                    permissions.forEach(p ->
-                        authorities.add(new SimpleGrantedAuthority(p))
-                    );
-                }
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                claims.getSubject(),
-                                null,
-                                authorities
-                        );
-
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
-
-            } catch (Exception e) {
-            	e.printStackTrace();
-                SecurityContextHolder.clearContext();
             }
+
+            if (permissions != null) {
+                permissions.forEach(p ->
+                        authorities.add(new SimpleGrantedAuthority(p))
+                );
+            }
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            claims.getSubject(),
+                            null,
+                            authorities
+                    );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (Exception e) {
+            // Invalid / expired token
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

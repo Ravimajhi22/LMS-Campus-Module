@@ -2,10 +2,8 @@ package com.campusFacilities.www.service.Imp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -226,8 +224,8 @@ public HostelComplaint updateComplaint(
     return hostelComplaintRepository.save(complaint);
 }
 
-// DELETE (OPTIONAL – ADMIN / SUPER_ADMIN)
-public void deleteComplaint(Long complaintId) {
+     // DELETE (OPTIONAL – ADMIN / SUPER_ADMIN)
+    public void deleteComplaint(Long complaintId) {
     hostelComplaintRepository.deleteById(complaintId);
 }
     // ================================ HostelRooms ==============================//
@@ -401,13 +399,11 @@ public void deleteComplaint(Long complaintId) {
         existing.setStudentName(updated.getStudentName());
         existing.setStudentPhone(updated.getStudentPhone());
         existing.setParentPhone(updated.getParentPhone());
-
         existing.setComplaintNature(updated.getComplaintNature());
         existing.setSeverity(updated.getSeverity());
         existing.setCurrentStatus(updated.getCurrentStatus());
         existing.setReportedDate(updated.getReportedDate());
         existing.setClinicalNotes(updated.getClinicalNotes());
-
         // hostel & room (important)
         existing.setHostel(updated.getHostel());
         existing.setRoom(updated.getRoom());
@@ -517,7 +513,7 @@ public StudentHostelAllocation updatePayment(
         existing.setPaymentStatus(allocation.getPaymentStatus());
         existing.setLastPaymentDate(allocation.getLastPaymentDate());
         existing.setStatus(allocation.getStatus());
-
+       
         return allocationRepository.save(existing);
         
     }

@@ -20,6 +20,7 @@ public class StudentVisitEntry {
 	    private Long visitId;
 
 	    // ================= STUDENT INFO (FROM TOKEN) =================
+	    
 	    @Column(name = "student_id", nullable = false)
 	    private Long studentId;
 

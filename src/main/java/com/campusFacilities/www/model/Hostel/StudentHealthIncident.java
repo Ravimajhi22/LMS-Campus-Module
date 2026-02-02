@@ -34,6 +34,7 @@ public class StudentHealthIncident {
     private String parentPhone;
     
     // ---------------- Hostel Mapping ----------------
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
     private Hostel hostel;
@@ -43,6 +44,7 @@ public class StudentHealthIncident {
     private HostelRoom room;
 
     // ---------------- Incident Details ----------------
+    
     @Column(nullable = false)
     private String complaintNature;
 

@@ -1,8 +1,6 @@
 package com.campusFacilities.www.model.Hostel;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,15 +33,18 @@ public class StudentHostelAllocation {
     
     
     // ---------------- Hostel Mapping ----------------
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
     private Hostel hostel;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private HostelRoom room;
 
+
     private LocalDate joinDate;
+    
     private LocalDate leaveDate;
 
     @Enumerated(EnumType.STRING)

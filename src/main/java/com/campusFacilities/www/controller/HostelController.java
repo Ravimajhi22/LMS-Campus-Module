@@ -35,7 +35,7 @@ public class HostelController {
     @Autowired
     private HostelServiceImpl hostelService;
 
-    // ================= HOSTEL =================
+    // ============================ HOSTEL =======================//
    
     //  CREATE
     @PreAuthorize("hasAuthority('HOSTEL_CREATE')")
