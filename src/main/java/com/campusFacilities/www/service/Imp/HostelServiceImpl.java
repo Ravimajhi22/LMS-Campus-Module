@@ -2,8 +2,10 @@ package com.campusFacilities.www.service.Imp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -20,6 +22,8 @@ import com.campusFacilities.www.repository.Hostel.MessDayMenuRepository;
 import com.campusFacilities.www.repository.Hostel.StudentHealthIncidentRepository;
 import com.campusFacilities.www.repository.Hostel.StudentHostelAllocationRepository;
 import com.campusFacilities.www.repository.Hostel.StudentVisitEntryRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class HostelServiceImpl {
@@ -404,6 +408,7 @@ public HostelComplaint updateComplaint(
         existing.setCurrentStatus(updated.getCurrentStatus());
         existing.setReportedDate(updated.getReportedDate());
         existing.setClinicalNotes(updated.getClinicalNotes());
+       
         // hostel & room (important)
         existing.setHostel(updated.getHostel());
         existing.setRoom(updated.getRoom());
@@ -421,16 +426,39 @@ public HostelComplaint updateComplaint(
     // ================= StudentHostelAllocationService=================
 
 // CREATE ALLOCATION
-public StudentHostelAllocation createAllocation(
-        StudentHostelAllocation allocation) {
+    @Transactional
+    public StudentHostelAllocation createAllocation(StudentHostelAllocation request) {
 
-    allocation.setStatus(StudentHostelAllocation.AllocationStatus.ACTIVE);
-    allocation.setPaymentStatus(StudentHostelAllocation.PaymentStatus.DUE);
-    allocation.setDueAmount(
-            allocation.getTotalFee().subtract(allocation.getAmountPaid()));
+        //  Fetch managed Hostel
+        Hostel hostel = hostelRepository.findById(
+                request.getHostel().getHostelId()
+        ).orElseThrow(() -> new RuntimeException("Hostel not found"));
 
-    return allocationRepository.save(allocation);
-}
+        //  Fetch managed Room
+        HostelRoom room = hostelRoomRepository.findById(
+                request.getRoom().getRoomId()
+        ).orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // Create NEW allocation 
+        StudentHostelAllocation allocation = new StudentHostelAllocation();
+
+        // Copy student data (from other DB)
+        allocation.setStudentId(request.getStudentId());
+        allocation.setStudentName(request.getStudentName());
+        allocation.setStudentEmail(request.getStudentEmail());
+        allocation.setParentName(request.getParentName());
+        allocation.setParentPhone(request.getParentPhone());
+
+        //  Set manage entities ONLY
+        allocation.setHostel(hostel);
+        allocation.setRoom(room);
+
+        allocation.setJoinDate(request.getJoinDate());
+        allocation.setLeaveDate(request.getLeaveDate());
+        allocation.setStatus(request.getStatus());
+
+        return allocationRepository.save(allocation);
+    }
 
 // GET ALL ALLOCATIONS (OPTIONAL FILTER BY STATUS)
 public List<StudentHostelAllocation> getAllAllocations(
@@ -501,8 +529,8 @@ public StudentHostelAllocation updatePayment(
 
         existing.setStudentName(allocation.getStudentName());
         existing.setStudentEmail(allocation.getStudentEmail());
-        existing.setFatherName(allocation.getFatherName());
-        existing.setFatherPhone(allocation.getFatherPhone());
+        existing.setParentName(allocation.getParentName());
+        existing.setParentPhone(allocation.getParentPhone());
         existing.setRoom(allocation.getRoom());
         existing.setJoinDate(allocation.getJoinDate());
         existing.setLeaveDate(allocation.getLeaveDate());

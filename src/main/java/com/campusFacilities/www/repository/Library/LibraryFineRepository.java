@@ -8,5 +8,7 @@ import com.campusFacilities.www.model.Library.LibraryFine;
 
 public interface LibraryFineRepository extends JpaRepository<LibraryFine, Long> {
 	
-	List<LibraryFine> findByIsDeletedFalse();	
+	List<LibraryFine> findByIsDeletedFalse();
+
+	List<LibraryFine> findByUserId(Long userId);
 }

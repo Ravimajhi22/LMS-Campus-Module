@@ -28,8 +28,8 @@ public class StudentHostelAllocation {
     private String studentName;
     private String studentEmail;
     
-    private String fatherName;
-    private String fatherPhone;
+    private String parentName;
+    private String parentPhone;
     
     
     // ---------------- Hostel Mapping ----------------
@@ -79,5 +79,7 @@ public class StudentHostelAllocation {
     }
 
     private LocalDate lastPaymentDate;
+
+	
 
 }

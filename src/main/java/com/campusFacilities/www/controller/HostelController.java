@@ -2,7 +2,6 @@ package com.campusFacilities.www.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -443,6 +441,7 @@ public class HostelController {
 
     //=======================================StudentVisitEntryController====================//
     
+   
     // CREATE VISIT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_CREATE')")
     @PostMapping("/visits")

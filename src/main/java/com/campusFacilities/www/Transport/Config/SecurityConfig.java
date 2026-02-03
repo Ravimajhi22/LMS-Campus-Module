@@ -52,7 +52,7 @@ public class SecurityConfig {
             "http://localhost:5174", 
             "http://localhost:5175",
             "http://192.168.1.31:5173",
-            "http:// 192.168.1.9:5173"
+            "http:// 192.168.1.12:5173"
             
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

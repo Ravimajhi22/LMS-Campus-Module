@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -17,28 +19,47 @@ import lombok.Data;
 @Data
 public class BookCategory {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryId;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @Column(name = "category_id")
+	    private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String categoryName;
+	    @Column(name = "category_name", nullable = false)
+	    private String categoryName;
 
-    private String description;
+	    @Column(name = "description")
+	    private String description;
 
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.ACTIVE;
+	    @Enumerated(EnumType.STRING)
+	    @Column(name = "status", nullable = false)
+	    private Status status = Status.ACTIVE;
 
-    private Boolean isDeleted = false;
+	    @Column(name = "is_deleted", nullable = false)
+	    private Boolean isDeleted = false;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+	    @Column(name = "created_at", nullable = false)
+	    private LocalDateTime createdAt;
 
-    private LocalDateTime updatedAt = LocalDateTime.now();
+	    @Column(name = "updated_at", nullable = false)
+	    private LocalDateTime updatedAt;
 
-    public enum Status {
-        ACTIVE, INACTIVE
-    }
+	    @PrePersist
+	    protected void onCreate() {
+	        createdAt = LocalDateTime.now();
+	        updatedAt = LocalDateTime.now();
+	        if (status == null)
+	            status = Status.ACTIVE;
+	        if (isDeleted == null)
+	            isDeleted = false;
+	    }
 
-   
-}
+	    @PreUpdate
+	    protected void onUpdate() {
+	        updatedAt = LocalDateTime.now();
+	    }
 
+	    public enum Status {
+	        ACTIVE,
+	        INACTIVE
+	    }
+	}

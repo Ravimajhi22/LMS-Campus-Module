@@ -2,7 +2,6 @@ package com.campusFacilities.www.Transport.Config;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -93,7 +92,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception e) {
-            // Invalid / expired token
+        
             SecurityContextHolder.clearContext();
         }
 
