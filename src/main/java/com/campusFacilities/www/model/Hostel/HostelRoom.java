@@ -44,9 +44,10 @@ import lombok.Data;
 	        FULL
 	    }
 	    // ---------- AUTO CALCULATED ----------
-	    @Column(name = "currently_occupied", nullable = false)
-	    private int currentlyOccupied = 0;
+	    @Column(nullable = false)
+	    private Integer currentlyOccupied = 0;
 
+	    
 	    @Column(name = "is_deleted")
 	    private Boolean isDeleted = false;
 

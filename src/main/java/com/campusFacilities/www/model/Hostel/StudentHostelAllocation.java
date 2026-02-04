@@ -1,6 +1,8 @@
 package com.campusFacilities.www.model.Hostel;
-import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,13 +38,20 @@ public class StudentHostelAllocation {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Hostel hostel;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HostelRoom room;
 
+    @Column
+    private String hostelName;
 
+    @Column(nullable = false)
+    private String roomNumber;
+    
     private LocalDate joinDate;
     
     private LocalDate leaveDate;
@@ -57,29 +66,4 @@ public class StudentHostelAllocation {
         CANCELLED
     }
     
-    @Column(nullable = false)
-    private BigDecimal monthlyFee;      
-
-    @Column(nullable = false)
-    private BigDecimal totalFee;       
-
-    @Column(nullable = false)
-    private BigDecimal amountPaid = BigDecimal.ZERO;  
-
-    @Column(nullable = false)
-    private BigDecimal dueAmount;     
-
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus = PaymentStatus.DUE; 
-
-    public enum PaymentStatus 
-    {
-        PAID,
-        DUE
-    }
-
-    private LocalDate lastPaymentDate;
-
-	
-
 }

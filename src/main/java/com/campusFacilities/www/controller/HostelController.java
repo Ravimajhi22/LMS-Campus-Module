@@ -1,5 +1,4 @@
 package com.campusFacilities.www.controller;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class HostelController {
 
     // ============================ HOSTEL =======================//
    
-    //  CREATE
+    //CREATE
     @PreAuthorize("hasAuthority('HOSTEL_CREATE')")
     @PostMapping("/hostel")
     public ResponseEntity<Hostel> createHostel(@RequestBody Hostel hostel) {
@@ -195,7 +194,7 @@ public class HostelController {
     @PostMapping("/complaint")
     public ResponseEntity<HostelComplaint> createComplaint(
             @RequestBody HostelComplaint complaint) {
-        return ResponseEntity.ok(hostelService.createComplaint(complaint));
+        return ResponseEntity.ok(hostelService.createComplaint(complaint, null));
     }
 
     //  GET ALL COMPLAINTS
@@ -406,29 +405,24 @@ public class HostelController {
     }
 
     // PATCH – UPDATE PAYMENT
-    @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_PAYMENT_UPDATE')")
-    @PatchMapping("/allocations/{id}/payment")
-    public ResponseEntity<StudentHostelAllocation> updatePayment(
-            @PathVariable Long id,
-            @RequestParam BigDecimal amountPaid,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate paymentDate) {
 
-        return ResponseEntity.ok(
-        		hostelService.updatePayment(id, amountPaid, paymentDate));
-    }
        // PUT – FULL UPDATE ALLOCATION
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_UPDATE')")
-    @PutMapping("/allocations/{id}")
-    public ResponseEntity<StudentHostelAllocation> updateAllocation(
-            @PathVariable Long id,
-            @RequestBody StudentHostelAllocation allocation) {
+    @PutMapping("/allocations/{allocationId}")
+    public ResponseEntity<?> updateAllocation(
+            @PathVariable Long allocationId,
+            @RequestBody StudentHostelAllocation body) {
+
+        if (allocationId == null || allocationId <= 0) {
+            return ResponseEntity.badRequest()
+                    .body("Invalid allocationId");
+        }
 
         return ResponseEntity.ok(
-                hostelService.updateAllocation(id, allocation));
+                hostelService.updateAllocation(allocationId, body)
+        );
     }
-    
+  
  // DELETE – SOFT DELETE ALLOCATION
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_DELETE')")
     @DeleteMapping("/allocations/{id}")
@@ -437,10 +431,8 @@ public class HostelController {
         hostelService.deleteAllocation(id);
         return ResponseEntity.ok("Allocation deleted successfully");
     }
-
-
-    //=======================================StudentVisitEntryController====================//
     
+    //=======================================StudentVisitEntryController====================//
    
     // CREATE VISIT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_CREATE')")

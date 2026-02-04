@@ -23,7 +23,6 @@ public class HostelComplaint {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long complaintId;
     
-    
     // ================= STUDENT INFO  =================//
     
     @Column(name = "student_id", nullable = false)
@@ -41,7 +40,7 @@ public class HostelComplaint {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
     private Hostel hostel;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
     private HostelRoom room;
