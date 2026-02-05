@@ -2,6 +2,7 @@ package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +31,11 @@ public class StudentHostelAllocation {
     private String studentName;
     private String studentEmail;
     
+
+    @JsonProperty("fatherName")
     private String parentName;
+
+    @JsonProperty("fatherPhone")
     private String parentPhone;
     
     
@@ -49,7 +54,7 @@ public class StudentHostelAllocation {
     @Column
     private String hostelName;
 
-    @Column(nullable = false)
+    @Column
     private String roomNumber;
     
     private LocalDate joinDate;

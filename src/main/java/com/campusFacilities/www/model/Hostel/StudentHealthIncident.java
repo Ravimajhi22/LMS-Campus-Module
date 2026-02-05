@@ -1,6 +1,9 @@
 package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,7 +27,7 @@ public class StudentHealthIncident {
     private Long incidentId;
 
     // ---------------- Student Info (from token / allocation) ----------------
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long studentId;
 
     private String studentName;
@@ -36,26 +39,64 @@ public class StudentHealthIncident {
     // ---------------- Hostel Mapping ----------------
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hostel_id", nullable = false)
+    @JoinColumn(name = "hostel_id", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Hostel hostel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "room_id", nullable =true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HostelRoom room;
+    
+    @Column
+    private String hostelName;
+
+    @Column
+    private String roomNumber;
+
 
     // ---------------- Incident Details ----------------
     
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String complaintNature;
+    @JsonProperty("medicalIssueType")
+    private ComplaintNature complaintNature;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Severity severity;
+
     public enum Severity {
         LOW,
         MEDIUM,
         HIGH,
-        CRITICAL
+        CRITICAL;
+
+        @com.fasterxml.jackson.annotation.JsonCreator
+        public static Severity fromValue(String value) {
+            return Severity.valueOf(value.toUpperCase());
+        }
     }
+
+    
+    public enum ComplaintNature {
+        FEVER,
+        HEADACHE,
+        COLD_FLU,
+        STOMACH_PAIN,
+        INJURY,
+        BODY_PAIN,
+        DIZZINESS,
+        FOOD_POISONING,
+        ALLERGY,
+        OTHER;
+
+        @com.fasterxml.jackson.annotation.JsonCreator
+        public static ComplaintNature fromValue(String value) {
+            return ComplaintNature.valueOf(value.toUpperCase());
+        }
+    }
+
 
     @Enumerated(EnumType.STRING)
     private IncidentStatus currentStatus;
@@ -76,4 +117,6 @@ public class StudentHealthIncident {
     // ---------------- Audit ----------------
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+	
 }

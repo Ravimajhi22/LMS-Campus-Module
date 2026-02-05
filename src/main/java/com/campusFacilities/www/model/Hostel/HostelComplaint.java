@@ -1,6 +1,9 @@
 package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -25,29 +28,39 @@ public class HostelComplaint {
     
     // ================= STUDENT INFO  =================//
     
-    @Column(name = "student_id", nullable = false)
+    @Column(name = "student_id", nullable =true)
     private Long studentId;
 
     @Column(name = "student_name", nullable = false)
     private String studentName;
 
-    @Column(name = "student_email", nullable = false)
-    private String studentEmail;
-
-    @Column(name = "student_phone", nullable = false)
-    private String studentPhone;
-
+	/*
+	 * @Column(name = "student_email", nullable = false) private String
+	 * studentEmail;
+	 * 
+	 * @Column(name = "student_phone", nullable = false) private String
+	 * studentPhone;
+	 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hostel_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Hostel hostel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HostelRoom room;
+    
+    @Column
+    private String hostelName;
 
+    @Column
+    private String roomNumber;
+
+    @JsonProperty("category")
     @Enumerated(EnumType.STRING)
     private IssueCategory issueCategory;
-
+    
     @Enumerated(EnumType.STRING)
     private PriorityLevel priority;
 
@@ -85,4 +98,6 @@ public class HostelComplaint {
         RESOLVED,
         CLOSED
     }
+
+
 }

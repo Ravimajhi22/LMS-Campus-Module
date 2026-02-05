@@ -1,6 +1,7 @@
 package com.campusFacilities.www.controller;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -22,6 +24,7 @@ import com.campusFacilities.www.model.Hostel.HostelRoom;
 import com.campusFacilities.www.model.Hostel.MessDayMenu;
 import com.campusFacilities.www.model.Hostel.StudentHealthIncident;
 import com.campusFacilities.www.model.Hostel.StudentHostelAllocation;
+import com.campusFacilities.www.model.Hostel.StudentHostelFee;
 import com.campusFacilities.www.model.Hostel.StudentVisitEntry;
 import com.campusFacilities.www.service.Imp.HostelServiceImpl;
 
@@ -37,10 +40,10 @@ public class HostelController {
     //CREATE
     @PreAuthorize("hasAuthority('HOSTEL_CREATE')")
     @PostMapping("/hostel")
-    public ResponseEntity<Hostel> createHostel(@RequestBody Hostel hostel) {
+    public ResponseEntity<Hostel> createHostel(@RequestBody Hostel hostel) 
+    {
         return ResponseEntity.ok(hostelService.createHostel(hostel));
     }
-
     // GET ALL
     @PreAuthorize("hasAuthority('HOSTEL_VIEW')")
     @GetMapping("/hostels")
@@ -192,9 +195,12 @@ public class HostelController {
     //CREATE COMPLAINT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_CREATE')")
     @PostMapping("/complaint")
-    public ResponseEntity<HostelComplaint> createComplaint(
+    public ResponseEntity<?> createComplaint(
             @RequestBody HostelComplaint complaint) {
-        return ResponseEntity.ok(hostelService.createComplaint(complaint, null));
+
+        return ResponseEntity.ok(
+            hostelService.createComplaint(complaint)
+        );
     }
 
     //  GET ALL COMPLAINTS
@@ -432,7 +438,7 @@ public class HostelController {
         return ResponseEntity.ok("Allocation deleted successfully");
     }
     
-    //=======================================StudentVisitEntryController====================//
+    //=======================================StudentVisitEntry====================//
    
     // CREATE VISIT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_CREATE')")
@@ -491,5 +497,79 @@ public class HostelController {
         return ResponseEntity.ok("Visit entry deleted successfully");
     }
    
-       
+       //=========================StudentHostelFe=======================//
+    
+    
+    @PreAuthorize("hasAuthority('HOSTEL_FEE_CREATE')")
+    @PostMapping("/fees")
+    public ResponseEntity<StudentHostelFee> createFee(
+            @RequestBody StudentHostelFee fee) {
+
+        return ResponseEntity.ok(
+                hostelService.createFee(fee)
+        );
+        
+    } 
+    @PreAuthorize("hasAuthority('HOSTEL_FEE_VIEW')")
+    @GetMapping("/fees")
+    public ResponseEntity<List<StudentHostelFee>> getAllFees(
+            @RequestParam(required = false)
+            StudentHostelFee.FeeStatus status) {
+
+        return ResponseEntity.ok(
+                hostelService.getAllFees(status)
+        );
     }
+
+    // GET FEE BY ID
+
+    @PreAuthorize("hasAuthority('HOSTEL_FEE_VIEW')")
+    @GetMapping("/fees/{id}")
+    public ResponseEntity<Hostel> getFeeById(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                hostelService.getHostelById(id)
+        );
+    }
+
+    // PATCH – UPDATE PAYMENT STATUS
+    
+	/*
+	 * @PreAuthorize("hasAuthority('HOSTEL_FEE_PAYMENT_UPDATE')")
+	 * 
+	 * @PatchMapping("/fees/{id}/payment") public ResponseEntity<StudentHostelFee>
+	 * updatePayment(
+	 * 
+	 * @PathVariable Long id,
+	 * 
+	 * @RequestParam Double amount) {
+	 * 
+	 * return ResponseEntity.ok( hostelService.updatePayment(id, amount) ); }
+	 */
+
+ 
+    // PUT – UPDATE HOSTEL FEE (FULL UPDATE)
+
+    @PreAuthorize("hasAuthority('HOSTEL_FEE_UPDATE')")
+    @PutMapping("/fees/{id}")
+    public ResponseEntity<StudentHostelFee> updateFee(
+            @PathVariable Long id,
+            @RequestBody StudentHostelFee fee) {
+
+        return ResponseEntity.ok(
+                hostelService.updateFee(id, fee)
+        );
+    }
+
+    // DELETE HOSTEL FEE  
+    @PreAuthorize("hasAuthority('HOSTEL_FEE_DELETE')")
+    @DeleteMapping("/fees/{id}")
+    public ResponseEntity<String> deleteFee(
+            @PathVariable Long id) {
+
+        hostelService.cancelFee(id);
+        return ResponseEntity.ok("Hostel fee deleted successfully");
+    }
+}
+

@@ -1,12 +1,10 @@
 package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -14,12 +12,14 @@ import com.campusFacilities.www.model.Hostel.HostelRoom;
 import com.campusFacilities.www.model.Hostel.MessDayMenu;
 import com.campusFacilities.www.model.Hostel.StudentHealthIncident;
 import com.campusFacilities.www.model.Hostel.StudentHostelAllocation;
+import com.campusFacilities.www.model.Hostel.StudentHostelFee;
 import com.campusFacilities.www.model.Hostel.StudentVisitEntry;
 import com.campusFacilities.www.repository.Hostel.HostelAttendanceRepository;
 import com.campusFacilities.www.repository.Hostel.HostelComplaintRepository;
 import com.campusFacilities.www.repository.Hostel.HostelRepository;
 import com.campusFacilities.www.repository.Hostel.HostelRoomRepository;
 import com.campusFacilities.www.repository.Hostel.MessDayMenuRepository;
+import com.campusFacilities.www.repository.Hostel.StudentFeeRepository;
 import com.campusFacilities.www.repository.Hostel.StudentHealthIncidentRepository;
 import com.campusFacilities.www.repository.Hostel.StudentHostelAllocationRepository;
 import com.campusFacilities.www.repository.Hostel.StudentVisitEntryRepository;
@@ -55,6 +55,12 @@ public class HostelServiceImpl {
     
     @Autowired 
     private StudentVisitEntryRepository visitRepository;
+    
+    @Autowired 
+    private StudentFeeRepository studentFeeRepository;
+
+   // @Autowired
+	//private StudentHostelFee StudentHostelFee ;
 
     // ================= HOSTEL =================
     
@@ -197,8 +203,8 @@ public class HostelServiceImpl {
     // -------- STUDENT INFO --------
     existing.setStudentId(updated.getStudentId());
     existing.setStudentName(updated.getStudentName());
-    existing.setStudentEmail(updated.getStudentEmail());
-    existing.setStudentPhone(updated.getStudentPhone());
+  //  existing.setStudentEmail(updated.getStudentEmail());
+    //existing.setStudentPhone(updated.getStudentPhone());
 
   
     // -------- COMPLAINT DETAILS --------
@@ -229,7 +235,7 @@ public HostelComplaint updateComplaint(
     return hostelComplaintRepository.save(complaint);
 }
 
-     // DELETE (OPTIONAL – ADMIN / SUPER_ADMIN)
+     // DELETE 
     public void deleteComplaint(Long complaintId) {
     hostelComplaintRepository.deleteById(complaintId);
 }
@@ -425,32 +431,121 @@ public HostelComplaint updateComplaint(
         incidentRepository.save(incident);
     }
 
+    
+    //========================= Students Hostel Fees==============================//
+    //post  
+    @Transactional
+    public StudentHostelFee createFee(StudentHostelFee request) {
+
+    	StudentHostelFee fee = new StudentHostelFee();
+
+        fee.setStudentId(request.getStudentId());
+        fee.setStudentName(request.getStudentName());
+        fee.setMonthlyFee(request.getMonthlyFee());
+        fee.setTotalFee(request.getTotalFee());
+        fee.setAmountPaid(0.0);
+        fee.setDueAmount(request.getTotalFee());
+       // fee.setStatus(StudentHostelFee.FeeStatus.DUE);
+        fee.setLastPaymentDate(null);
+        return studentFeeRepository.save(fee);
+    }
+
+    //Get 
+    public List<StudentHostelFee> getAllFees(StudentHostelFee.FeeStatus status) {
+
+        if (status != null) {
+            return studentFeeRepository.findByStatus(status);
+        }
+        return studentFeeRepository.findAll();
+    }
+    
+      //Patch
+		/*
+		 * @Transactional public StudentHostelFee updatePayment( Long feeId, Double
+		 * amountPaid) {
+		 * 
+		 * StudentHostelFee fee = getById(fee);
+		 * 
+		 * double newPaid = fee.getAmountPaid() + amountPaid; double due =
+		 * fee.getTotalFee() - newPaid; fee.setAmountPaid(newPaid);
+		 * fee.setDueAmount(due); fee.setLastPaymentDate(LocalDate.now()); if (due <= 0)
+		 * { fee.setStatus(StudentHostelFee.FeeStatus.PAID); fee.setDueAmount(0.0); }
+		 * else { fee.setStatus(StudentHostelFee.FeeStatus.PARTIALLY_PAID); }
+		 * 
+		 * return studentFeeRepository.save(fee); }
+		 */
+    //put
+    @Transactional
+    public StudentHostelFee updateFee(Long id, StudentHostelFee feeRequest) {
+
+        StudentHostelFee existing = studentFeeRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Fee not found with id: " + id
+                        )
+                );
+
+        existing.setStudentName(feeRequest.getStudentName());
+        existing.setMonthlyFee(feeRequest.getMonthlyFee());
+        existing.setTotalFee(feeRequest.getTotalFee());
+
+        // Recalculate due
+        double due = existing.getTotalFee() - existing.getAmountPaid();
+        existing.setDueAmount(due);
+
+        return studentFeeRepository.save(existing);
+    }
+    
+    //Delete
+    @Transactional
+    public void cancelFee(Long id) {
+
+        StudentHostelFee fee = studentFeeRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Fee not found"
+                        )
+                );
+
+       // fee.setStatus(StudentHostelFee.FeeStatus.DUE);
+        fee.setDueAmount(fee.getTotalFee());
+        fee.setAmountPaid(0.0);
+
+        studentFeeRepository.save(fee);
+    }
+
+    
     // ================= StudentHostelAllocationService=================
 
 // CREATE ALLOCATION
     @Transactional
     public StudentHostelAllocation createAllocation(StudentHostelAllocation request) {
-    	
+
         Hostel hostel = hostelRepository.findById(
                 request.getHostel().getHostelId()
         ).orElseThrow(() -> new RuntimeException("Hostel not found"));
 
-     
         HostelRoom room = hostelRoomRepository.findById(
                 request.getRoom().getRoomId()
         ).orElseThrow(() -> new RuntimeException("Room not found"));
-        
+
         StudentHostelAllocation allocation = new StudentHostelAllocation();
+
         allocation.setStudentId(request.getStudentId());
         allocation.setStudentName(request.getStudentName());
         allocation.setStudentEmail(request.getStudentEmail());
         allocation.setParentName(request.getParentName());
         allocation.setParentPhone(request.getParentPhone());
-        allocation.setHostelName(request.getHostelName());
-        allocation.setRoomNumber(request.getRoomNumber());
+        allocation.setHostelName(hostel.getHostelName());
+        allocation.setRoomNumber(room.getRoomNumber());
         allocation.setJoinDate(request.getJoinDate());
         allocation.setLeaveDate(request.getLeaveDate());
         allocation.setStatus(request.getStatus());
+        allocation.setHostel(hostel);
+        allocation.setRoom(room);
+
         return allocationRepository.save(allocation);
     }
 
@@ -526,34 +621,33 @@ public StudentHostelAllocation updateAllocation(Long id, StudentHostelAllocation
 
     // ================= Hostel complaints =================
 
-    public HostelComplaint createComplaint(HostelComplaint request, Long roomId) 
-    {
-    
-        if (request.getHostel() == null || request.getRoom() == null) {
-            throw new IllegalArgumentException("Hostel ID and Room ID are required");
-        }
-        String name = null;
-		Hostel hostel = hostelRepository.findByHostelName(name)
-                .orElseThrow(() -> new RuntimeException("Hostel not found"));
+   
+    public HostelComplaint createComplaint(HostelComplaint request) {
 
-		HostelRoom room = hostelRoomRepository.findById(roomId)
-		        .orElseThrow(() -> new RuntimeException("Room not found"));
+        Hostel hostel = hostelRepository
+            .findByHostelName(request.getHostelName())
+            .orElseThrow(() -> new RuntimeException("Hostel not found"));
 
-		System.out.println("Allocated room number: " + room.getRoomNumber());
+        HostelRoom room = hostelRoomRepository
+            .findByRoomNumber(request.getRoomNumber())
+            .orElseThrow(() -> new RuntimeException("Room not found"));
+
         HostelComplaint complaint = new HostelComplaint();
-        complaint.setStudentId(request.getStudentId());
         complaint.setStudentName(request.getStudentName());
-        complaint.setStudentEmail(request.getStudentEmail());
-        complaint.setStudentPhone(request.getStudentPhone());
         complaint.setHostel(hostel);
         complaint.setRoom(room);
+        complaint.setHostelName(hostel.getHostelName());
+        complaint.setRoomNumber(room.getRoomNumber());
         complaint.setIssueCategory(request.getIssueCategory());
         complaint.setPriority(request.getPriority());
         complaint.setDescription(request.getDescription());
-        complaint.setReportedDate(LocalDate.now());
-        complaint.setStatus(HostelComplaint.ComplaintStatus.OPEN);
+        //complaint.setAdminRemarks(request.getRemarks());
+        complaint.setReportedDate(request.getReportedDate());
+        complaint.setStatus(request.getStatus());
+
         return complaintRepository.save(complaint);
     }
+
     // READ
     public List<HostelComplaint> getAllComplaints() {
         return complaintRepository.findAll();
@@ -648,5 +742,6 @@ public StudentHostelAllocation updateAllocation(Long id, StudentHostelAllocation
         public void deleteVisit(Long visitId) {
             visitRepository.deleteById(visitId);
         }
-    
+
+		
     }
