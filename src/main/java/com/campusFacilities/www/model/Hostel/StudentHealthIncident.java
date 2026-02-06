@@ -1,6 +1,7 @@
 package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -107,12 +108,17 @@ public class StudentHealthIncident {
         RECOVERED
     }
 
+
+    @JsonCreator
+    public static IncidentStatus from(String value) {
+        return value == null ? null : IncidentStatus.valueOf(value.toUpperCase());
+    }
     @Column(nullable = false)
     private LocalDate reportedDate;
 
     // ---------------- Clinical Notes ----------------
-    @Column(length = 1000)
-    private String clinicalNotes; 
+    @JsonProperty("clinical_notes")
+    private String clinicalNotes;
 
     // ---------------- Audit ----------------
     @Column(name = "is_deleted")

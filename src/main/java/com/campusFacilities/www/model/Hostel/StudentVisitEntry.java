@@ -2,6 +2,8 @@ package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,21 +23,22 @@ public class StudentVisitEntry {
 
 	    // ================= STUDENT INFO (FROM TOKEN) =================
 	    
-	    @Column(name = "student_id", nullable = false)
+	    @Column(nullable = true)
 	    private Long studentId;
 
 	    @Column(name = "student_name", nullable = false)
 	    private String studentName;
 
 	    // ================= VISITOR INFO =================
-	    @Column(name = "visitor_name", nullable = false)
+	    @JsonProperty("parentName")
+	    @Column(nullable = false)
 	    private String visitorName;
 
-	    @Enumerated(EnumType.STRING)
-	    @Column(nullable = true)
-	    private Relationship relationship;
+	    @JsonProperty("relation")
+	    @Column(name = "relationship")
+	    private String relationship;
 
-	    @Column(name = "visitor_contact", nullable = false)
+	    @JsonProperty("contactNumber")
 	    private String visitorContact;
 
 	    // ================= VISIT DETAILS =================
@@ -45,12 +48,17 @@ public class StudentVisitEntry {
 	    @Column(name = "visit_time", nullable = false)
 	    private LocalTime visitTime;
 
-	    @Column(name = "purpose_of_visit", length = 1000)
+	    @JsonProperty("purpose")
+	    @Column(name = "purpose_of_visit")
 	    private String purposeOfVisit;
-
 	    // ================= STATUS & AUDIT =================
+	    
+	    @JsonProperty("visitStatus")
 	    @Enumerated(EnumType.STRING)
-	    private VisitStatus status = VisitStatus.SCHEDULED;
+	    @Column(nullable = false)
+	    private VisitStatus status;
+
+
 
 	    @Column(name = "created_at", updatable = false)
 	    private LocalDate createdAt = LocalDate.now();

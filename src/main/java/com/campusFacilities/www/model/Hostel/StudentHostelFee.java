@@ -1,7 +1,5 @@
 package com.campusFacilities.www.model.Hostel;
-
 import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,13 +15,12 @@ import lombok.Data;
 @Data
 public class StudentHostelFee {
 	
-	  public static final String FeeStatus = null;
 
 	  @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long feeId;
 
-	    @Column(nullable = false)
+	    @Column(nullable = true)
 	    private Long studentId;
 
 	    @Column(nullable = false)
@@ -41,10 +38,12 @@ public class StudentHostelFee {
 	    @Column(nullable = false)
 	    private Double dueAmount;
 
-	    @Enumerated(EnumType.STRING)
-	    private FeeStatus status;
-
 	    private LocalDate lastPaymentDate;
+
+	   
+	    @Enumerated(EnumType.STRING)
+	    @Column(nullable = false)
+	    private FeeStatus status;
 
 	    public enum FeeStatus {
 	        PAID,

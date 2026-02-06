@@ -304,7 +304,7 @@ public class HostelController {
     	hostelService.deleteMenu(id);
         return ResponseEntity.ok("Menu deleted successfully");
     }
-//=================== StudentHealthIncidentController =================//
+//=================== StudentHealthIncident =================//
     
     //  CREATE HEALTH INCIDENT
     @PreAuthorize("hasAuthority('HOSTEL_HEALTH_INCIDENT_CREATE')")
@@ -364,9 +364,7 @@ public class HostelController {
         return ResponseEntity.ok("Health incident deleted successfully");
     }
     // ================= StudentHostelAllocation ====================//
-        
-        
- // CREATE ALLOCATION
+    // CREATE ALLOCATION
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_CREATE')")
     @PostMapping("/allocations")
     public ResponseEntity<StudentHostelAllocation> createAllocation(
@@ -497,14 +495,14 @@ public class HostelController {
         return ResponseEntity.ok("Visit entry deleted successfully");
     }
    
-       //=========================StudentHostelFe=======================//
+       //=========================StudentHostelFee=======================//
     
     
     @PreAuthorize("hasAuthority('HOSTEL_FEE_CREATE')")
     @PostMapping("/fees")
     public ResponseEntity<StudentHostelFee> createFee(
             @RequestBody StudentHostelFee fee) {
-
+    	 fee.setFeeId(null);
         return ResponseEntity.ok(
                 hostelService.createFee(fee)
         );
@@ -520,9 +518,7 @@ public class HostelController {
                 hostelService.getAllFees(status)
         );
     }
-
     // GET FEE BY ID
-
     @PreAuthorize("hasAuthority('HOSTEL_FEE_VIEW')")
     @GetMapping("/fees/{id}")
     public ResponseEntity<Hostel> getFeeById(
@@ -531,26 +527,9 @@ public class HostelController {
         return ResponseEntity.ok(
                 hostelService.getHostelById(id)
         );
-    }
-
-    // PATCH – UPDATE PAYMENT STATUS
-    
-	/*
-	 * @PreAuthorize("hasAuthority('HOSTEL_FEE_PAYMENT_UPDATE')")
-	 * 
-	 * @PatchMapping("/fees/{id}/payment") public ResponseEntity<StudentHostelFee>
-	 * updatePayment(
-	 * 
-	 * @PathVariable Long id,
-	 * 
-	 * @RequestParam Double amount) {
-	 * 
-	 * return ResponseEntity.ok( hostelService.updatePayment(id, amount) ); }
-	 */
-
- 
-    // PUT – UPDATE HOSTEL FEE (FULL UPDATE)
-
+       }
+	  
+    // PUT 
     @PreAuthorize("hasAuthority('HOSTEL_FEE_UPDATE')")
     @PutMapping("/fees/{id}")
     public ResponseEntity<StudentHostelFee> updateFee(
@@ -561,8 +540,7 @@ public class HostelController {
                 hostelService.updateFee(id, fee)
         );
     }
-
-    // DELETE HOSTEL FEE  
+    // DELETE
     @PreAuthorize("hasAuthority('HOSTEL_FEE_DELETE')")
     @DeleteMapping("/fees/{id}")
     public ResponseEntity<String> deleteFee(
