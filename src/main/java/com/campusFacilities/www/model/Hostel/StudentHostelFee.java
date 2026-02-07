@@ -9,14 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-
 @Entity
 @Table(name = "student_Hostel_fees")
 @Data
 public class StudentHostelFee {
 	
-
-	  @Id
+	    @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long feeId;
 
@@ -39,7 +37,6 @@ public class StudentHostelFee {
 	    private Double dueAmount;
 
 	    private LocalDate lastPaymentDate;
-
 	   
 	    @Enumerated(EnumType.STRING)
 	    @Column(nullable = false)

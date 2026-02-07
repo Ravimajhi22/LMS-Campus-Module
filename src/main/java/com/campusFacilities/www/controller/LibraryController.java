@@ -1,5 +1,6 @@
 package com.campusFacilities.www.controller;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.campusFacilities.www.Transport.util.QRCodeUtil;
 import com.campusFacilities.www.model.Library.BookBarcode;
 import com.campusFacilities.www.model.Library.BookCategory;
@@ -177,12 +179,12 @@ public class LibraryController {
     }
 
     @PutMapping("/fines/{id}")
-    @PreAuthorize("hasAuthority('LIBRARY_FINE_UPDATE')")
     public ResponseEntity<?> updateFine(@PathVariable Long id, @RequestBody LibraryFine fine) {
-        Long studentId = null;
-		return ResponseEntity.ok(libraryService.getFinesByUserId(studentId));
+        libraryService.payFine(id); 
+        Long studentId = fine.getUserId(); // Take ID from the request body
+        return ResponseEntity.ok(libraryService.getFinesByUserId(studentId));
     }
-
+    
  
     
     //==================Members====================//
@@ -234,7 +236,6 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.getSettings());
     }
 
-    
  // ================= BARCODES =================
 
     @PostMapping("/books/{id}/generate-barcodes")

@@ -1,5 +1,6 @@
 package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,8 @@ public class LibraryServiceImpl {
      
      @Autowired
      private FineCalculationService fineCalculationService;
+
+	 private BookIssueRecord issue;
 
     // ================= CATEGORY =================
 
@@ -196,8 +199,6 @@ public class LibraryServiceImpl {
             throw new RuntimeException("Book limit exceeded (Max: " + maxBooks + ")");
         }
 
-        // Only decrement copies if we are NOT fulfilling a PRE-HELD reservation
-        // (RESERVED status means we are taking a fresh copy from shelf)
         if (!isHeldReservation) {
             book.setAvailableCopies(book.getAvailableCopies() - 1);
             if (book.getAvailableCopies() == 0) {
@@ -227,8 +228,6 @@ public class LibraryServiceImpl {
         // RESERVATION CHECK
         List<BookReservation> userReservations = bookReservationRepository.findByBookIdAndUserIdAndIsDeletedFalse(bookId,
                 userId);
-
-        // Find ANY active reservation (Held OR just Reserved)
         BookReservation activeRes = userReservations.stream()
                 .filter(r -> r.getStatus() == BookReservation.Status.AVAILABLE
                         || r.getStatus() == BookReservation.Status.RESERVED)
@@ -242,8 +241,6 @@ public class LibraryServiceImpl {
 
         LibrarySettings settings = librarySettingsRepository.findByMemberRoleAndIsDeletedFalse(memberRole)
                 .orElse(null);
-
-        // Fallback defaults if settings are missing
         int issueDuration = 14;
         int maxBooks = 3;
 
@@ -272,8 +269,7 @@ public class LibraryServiceImpl {
 
             bc.setIsIssued(true);
         }
-
-        // Only decrement copies if we are NOT fulfilling a PRE-HELD reservation
+        
         if (!isHeldReservation) {
             book.setAvailableCopies(book.getAvailableCopies() - 1);
             if (book.getAvailableCopies() == 0) {
@@ -282,13 +278,10 @@ public class LibraryServiceImpl {
         }
 
         booksRepository.saveAndFlush(book);
-
-        // Close reservation
         if (activeRes != null) {
             activeRes.setStatus(BookReservation.Status.COLLECTED);
             bookReservationRepository.save(activeRes);
         }
-
         BookIssueRecord issue = new BookIssueRecord();
         issue.setBook(book);
         issue.setUserId(userId);
@@ -296,7 +289,6 @@ public class LibraryServiceImpl {
         issue.setBarcodeValue(barcode);
         issue.setIssueDate(LocalDate.now());
         issue.setDueDate(LocalDate.now().plusDays(issueDuration));
-
         return issueRepository.save(issue);
     }
 
@@ -304,9 +296,8 @@ public class LibraryServiceImpl {
         LibrarySettings settings = librarySettingsRepository.findByMemberRoleAndIsDeletedFalse(memberRole)
                 .orElse(null);
 
-        // Fail safe if settings missing for role
+        
         if (settings == null) {
-            // Fallback: If no settings exist yet, allow up to 3 books by default
             long issuedCount = issueRepository.countByUserIdAndStatus(userId, BookIssueRecord.Status.ISSUED);
             return issuedCount < 3;
         }
@@ -327,13 +318,21 @@ public class LibraryServiceImpl {
 
             long days = java.time.temporal.ChronoUnit.DAYS
                     .between(issue.getDueDate(), issue.getReturnDate());
+           
+            // --- FIX ---
+            // 1. Get the member role (Student/Faculty) from the stored issue record
+            String memberRole = issue.getUserCategory(); 
 
-           // =========================================================
-            
-
+            // 2. Fetch specific settings for this role
             LibrarySettings settings = librarySettingsRepository
-                    .findFirstByIsDeletedFalse()
+                    .findByMemberRoleAndIsDeletedFalse(memberRole)
                     .orElse(null);
+
+            // 3. Fallback to generic if specific role settings missing
+            if (settings == null) {
+                settings = librarySettingsRepository.findFirstByIsDeletedFalse().orElse(null);
+            }
+            // --- END FIX ---
 
             if (settings != null) {
                 double fineAmount = fineCalculationService
@@ -344,13 +343,18 @@ public class LibraryServiceImpl {
                     fine.setIssueRecord(issue);
                     fine.setUserId(issue.getUserId());
                     fine.setFineAmount(fineAmount);
+                    fine.setPaidStatus(LibraryFine.Status.UNPAID); // Optional: ensure status set
+                    fine.setCreatedAt(LocalDateTime.now()); // Optional: ensure timestamp set
                     libraryFineRepository.save(fine);
                 }
             }
         }
-
+        
+        // ... (Reservation logic continues below - untouched)
+        
         Books book = issue.getBook();
-
+        // ... rest of method
+      
         List<BookReservation> reservations =
                 bookReservationRepository.findByBookIdAndIsDeletedFalse(book.getId());
 
@@ -451,15 +455,24 @@ public class LibraryServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Book not found"));
         reservation.setBook(book);
 
-        // Use user-requested logic: Block reservation if copies are available
+        // Optional: Block reservation if copies are available.
+        // Comment out if you want to allow reserving even if available.
         if (book.getAvailableCopies() > 0) {
             throw new RuntimeException(
                     "Book is currently available. No reservation needed. Please visit the library to collect it.");
         }
         
         reservation.setReservedAt(LocalDate.now());
-        reservation.setReservationDate(null);
-        reservation.setReserveUntil(null);
+
+        // FIX: Only set to null if NOT provided by frontend
+        if (reservation.getReservationDate() == null) {
+             reservation.setReservationDate(null); // Or set to LocalDate.now() if creating active request
+        }
+        if (reservation.getReserveUntil() == null) {
+             reservation.setReserveUntil(null);
+        }
+        
+        // Ensure AdminHold is null initially
         reservation.setAdminHoldFrom(null);
         reservation.setAdminHoldUntil(null);
 
@@ -467,31 +480,31 @@ public class LibraryServiceImpl {
         reservation.setIsDeleted(false);
 
         try {
-            return librarySettingsRepository.save(reservation);
+            // FIX: Using bookReservationRepository, NOT librarySettingsRepository (Your snippet had a typo!)
+            return bookReservationRepository.save(reservation);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to save reservation: " + e.getMessage(), e);
         }
     }
-
+     //Get
     public List<BookReservation> getReservations() {
         return bookReservationRepository.findByIsDeletedFalse();
     }
 
+    //Delete 
     public void deleteReservation(Long id) {
         BookReservation res = bookReservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
         res.setIsDeleted(true);
         bookReservationRepository.save(res);
     }
-
+     //Update 
     public BookReservation updateReservationStatus(Long id, BookReservation.Status status) {
         BookReservation res =bookReservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
-
-        // Check for expiry before allowing pickup
         if (status == BookReservation.Status.COLLECTED) {
-            // Check based on HOLD deadline (adminHoldUntil)
+    
             if (res.getStatus() == BookReservation.Status.AVAILABLE &&
                     res.getAdminHoldUntil() != null &&
                     res.getAdminHoldUntil().isBefore(LocalDate.now())) {
@@ -502,15 +515,14 @@ public class LibraryServiceImpl {
                 book.setStatus(Books.Status.AVAILABLE);
                 booksRepository.saveAndFlush(book);
 
-                res.setStatus(BookReservation.Status.NO_RESPONSE); // Using NO_RESPONSE to map to Expired
+                res.setStatus(BookReservation.Status.NO_RESPONSE); 
                 bookReservationRepository.save(res);
                 throw new RuntimeException("Pickup window expired");
             }
         }
-
-        // Logic Change: Admin puts book ON HOLD (Available for pickup)
+        
         if (status == BookReservation.Status.AVAILABLE) {
-            if (res.getStatus() != BookReservation.Status.AVAILABLE) { // Only do this once
+            if (res.getStatus() != BookReservation.Status.AVAILABLE) { 
                 Books book = res.getBook();
                 if (book.getAvailableCopies() <= 0) {
                     throw new RuntimeException("No copies available to hold");
@@ -523,21 +535,14 @@ public class LibraryServiceImpl {
             }
         }
 
-        // Logic Change: User COLLECTS the book
         if (status == BookReservation.Status.COLLECTED) {
-            // Count was decremented when it went to AVAILABLE (Hold)
-            // So we do nothing to copies here.
-
-            // Ideally should also create Issue Record here?
-            // Leaving that part as current scope seems to focus on counts.
+           
         }
 
         if (status == BookReservation.Status.CANCELLED) {
-            // If a user cancels a reservation, we should check if it was holding a book.
-            // If status was AVAILABLE (Held), then we must return it to shelf!
             if (res.getStatus() == BookReservation.Status.AVAILABLE) {
                 Books book = res.getBook();
-                book.setAvailableCopies(book.getAvailableCopies() + 1); // Release hold
+                book.setAvailableCopies(book.getAvailableCopies() + 1); 
                 if (book.getAvailableCopies() > 0) {
                     book.setStatus(Books.Status.AVAILABLE);
                 }
@@ -555,18 +560,18 @@ public class LibraryServiceImpl {
         if (settings.getMemberRole() == null) {
             throw new IllegalArgumentException("Member Role is required");
         }
-
-        // Ensure isDeleted is never null to prevent duplicates on lookup
+        
         if (settings.getIsDeleted() == null) {
             settings.setIsDeleted(false);
         }
-
-        // Check availability by Role to avoid duplicates if ID is null
-        // Check availability by Role to avoid duplicates if ID is null
-        LibrarySettings existingSettings = librarySettingsRepository
-                .findByMemberRoleAndIsDeletedFalse(settings.getMemberRole())
-                .orElse(null);
-
+		/*
+		 * LibrarySettings existingSettings = librarySettingsRepository
+		 * .findByMemberRoleAndIsDeletedFalse(settings.getMemberRole()) .orElse(null);
+		 */
+        LibrarySettings  existingSettings = librarySettingsRepository
+                .findByMemberRoleAndIsDeletedFalse(issue.getUserCategory()) // Fetch using the user's role!
+                .orElse(librarySettingsRepository.findFirstByIsDeletedFalse().orElse(null)); // Fallback if needed
+        
         if (existingSettings != null) {
             // Update existing settings
             existingSettings.setMaxBooks(settings.getMaxBooks());

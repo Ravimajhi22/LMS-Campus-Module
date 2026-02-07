@@ -149,10 +149,11 @@ public class HostelController {
     // MARK ATTENDANCE
     @PreAuthorize("hasAuthority('HOSTEL_ATTENDANCE_MARK')")
     @PostMapping("/attendance")
-    public ResponseEntity<HostelAttendance> markAttendance(
-            @RequestBody HostelAttendance attendance) {
-        return ResponseEntity.ok(hostelService.markAttendance(attendance));
+    public HostelAttendance markAttendance(
+            @RequestBody HostelAttendance request) {
+        return hostelService.markAttendance(request);
     }
+
 
     //  GET ALL ATTENDANCE (DATE FILTER OPTIONAL)
     @PreAuthorize("hasAuthority('HOSTEL_ATTENDANCE_VIEW')")
@@ -364,6 +365,7 @@ public class HostelController {
         return ResponseEntity.ok("Health incident deleted successfully");
     }
     // ================= StudentHostelAllocation ====================//
+    
     // CREATE ALLOCATION
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_CREATE')")
     @PostMapping("/allocations")
@@ -372,18 +374,16 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.createAllocation(allocation));
     }
-
     // GET ALL ALLOCATIONS
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_VIEW')")
     @GetMapping("/allocations")
     public ResponseEntity<List<StudentHostelAllocation>> getAllAllocations(
             @RequestParam(required = false)
-            StudentHostelAllocation.AllocationStatus status) {
-
+            StudentHostelAllocation.AllocationStatus status) 
+    {
         return ResponseEntity.ok(
         		hostelService.getAllAllocations(status));
     }
-
     // GET ALLOCATION BY ID
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_VIEW')")
     @GetMapping("/allocations/{id}")
@@ -393,7 +393,7 @@ public class HostelController {
         		hostelService.getAllocationById(id));
     }
 
-    //  PATCH – UPDATE STATUS (CHECKOUT / CANCEL)
+    //  PATCH
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_STATUS_UPDATE')")
     @PatchMapping("/allocations/{id}/status")
     public ResponseEntity<StudentHostelAllocation> updateAllocationStatus(
@@ -408,9 +408,7 @@ public class HostelController {
         		hostelService.updateAllocationStatus(id, status, leaveDate));
     }
 
-    // PATCH – UPDATE PAYMENT
-
-       // PUT – FULL UPDATE ALLOCATION
+       // PUT
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_UPDATE')")
     @PutMapping("/allocations/{allocationId}")
     public ResponseEntity<?> updateAllocation(
@@ -427,7 +425,7 @@ public class HostelController {
         );
     }
   
- // DELETE – SOFT DELETE ALLOCATION
+ // DELETE
     @PreAuthorize("hasAuthority('HOSTEL_ALLOCATION_DELETE')")
     @DeleteMapping("/allocations/{id}")
     public ResponseEntity<String> deleteAllocation(@PathVariable Long id) {

@@ -24,7 +24,7 @@ public class FineCalculationService {
         List<FineSlab> slabs = fineSlabRepository.findByLibrarySettingsSettingIdOrderByFromDayAsc(settingId);
 
         if (slabs.isEmpty()) {
-            return 0.0; // No fine slabs configured
+            return 0.0; 
         }
 
         double totalFine = 0.0;
@@ -61,10 +61,7 @@ public class FineCalculationService {
 
         return totalFine;
     }
-
-    /**
-     * Calculate fine amount for a specific date range
-     */
+	
     public double calculateFineForDateRange(Long settingId, java.time.LocalDate issueDate,
             java.time.LocalDate returnDate, int issueDurationDays) {
         if (returnDate == null || issueDate == null) {

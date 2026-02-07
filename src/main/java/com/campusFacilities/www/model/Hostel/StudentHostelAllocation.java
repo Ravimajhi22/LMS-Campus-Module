@@ -63,12 +63,14 @@ public class StudentHostelAllocation {
 
     @Enumerated(EnumType.STRING)
     private AllocationStatus status = AllocationStatus.ACTIVE;
-    
     public enum AllocationStatus
     {
         ACTIVE,
         CHECKED_OUT,
         CANCELLED
     }
+	public Long getRoomId() {
+		return null;
+	}
     
 }

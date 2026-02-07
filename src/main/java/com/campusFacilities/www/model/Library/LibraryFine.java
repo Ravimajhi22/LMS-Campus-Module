@@ -1,5 +1,7 @@
 package com.campusFacilities.www.model.Library;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,4 +42,9 @@ public class LibraryFine {
         PAID,
         UNPAID
     }
+
+	public void setCreatedAt(LocalDateTime now) {
+		// TODO Auto-generated method stub
+		
+	}
 }

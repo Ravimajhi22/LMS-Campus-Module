@@ -1,9 +1,12 @@
 package com.campusFacilities.www.model.Hostel;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,16 +23,20 @@ public class HostelAttendance {
     private Long attendanceId;
 
     // ---------------- Student Info  ----------------
-    @Column(name = "student_id", nullable = false)
+    @Column(name = "student_id", nullable = true)
     private Long studentId;
 
     @Column(name = "student_name", nullable = false)
     private String studentName;
 
     // ---------------- Room Info ----------------
-    @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable =false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private HostelRoom room;
+    
+    @Column
+    private String roomNumber;
 
     // ---------------- Attendance ----------------
     @Column(name = "attendance_date", nullable = false)
@@ -38,15 +45,16 @@ public class HostelAttendance {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceStatus status;
-
     public enum AttendanceStatus {
         PRESENT,
         ABSENT
     }
 
     // ---------------- Audit ----------------
-    @Column(name = "marked_at")
-    private LocalDate markedAt = LocalDate.now();
+    @Column(name = "marked_at", nullable = false)
+    private LocalDateTime markedAt;
+
+	
 
 
 }
