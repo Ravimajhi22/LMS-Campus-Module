@@ -1,7 +1,6 @@
 package com.campusFacilities.www.controller;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.campusFacilities.www.model.Hostel.Hostel;
 import com.campusFacilities.www.model.Hostel.HostelAttendance;
 import com.campusFacilities.www.model.Hostel.HostelComplaint;
@@ -192,18 +190,15 @@ public class HostelController {
     
     //===================HostelComplaints====================//
     
-    
     //CREATE COMPLAINT (STUDENT)
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_CREATE')")
     @PostMapping("/complaint")
     public ResponseEntity<?> createComplaint(
             @RequestBody HostelComplaint complaint) {
-
         return ResponseEntity.ok(
             hostelService.createComplaint(complaint)
         );
-    }
-
+        }
     //  GET ALL COMPLAINTS
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_VIEW')")
     @GetMapping("/complaints")
@@ -213,17 +208,14 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.getAllComplaints(status));
     }
-
     //  GET COMPLAINT BY ID
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_VIEW')")
     @GetMapping("/complaint/{id}")
     public ResponseEntity<HostelComplaint> getComplaintById(
             @PathVariable Long id) {
         return ResponseEntity.ok(
-        		hostelService.getComplaintById(id));
-    }
-
- // PUT – FULL UPDATE COMPLAINT
+        		hostelService.getComplaintById(id)); }
+    // PUT 
     @PreAuthorize("hasAuthority('HOSTEL_COMPLAINT_UPDATE')")
     @PutMapping("/complaint/{id}")
     public ResponseEntity<HostelComplaint> updateComplaintFull(
@@ -272,14 +264,14 @@ public class HostelController {
         return ResponseEntity.ok(hostelService.getAllMenus());
     }
 
-    // GET MENU BY ID
+    // GET BY ID
     @PreAuthorize("hasAuthority('MESS_MENU_VIEW')")
     @GetMapping("/mess-menus/{id}")
     public ResponseEntity<MessDayMenu> getMenuById(@PathVariable Long id) {
         return ResponseEntity.ok(hostelService.getMenuById(id));
     }
 
-    // PATCH (PARTIAL UPDATE)
+    // PATCH
     @PreAuthorize("hasAuthority('MESS_MENU_UPDATE')")
     @PatchMapping("/mess-menu/{id}")
     public ResponseEntity<MessDayMenu> updateMenu(
@@ -288,7 +280,7 @@ public class HostelController {
         return ResponseEntity.ok(
         		hostelService.updateMenuPartial(id, menu));
     }
- // PUT (FULL UPDATE)
+ // PUT 
     @PreAuthorize("hasAuthority('MESS_MENU_UPDATE')")
     @PutMapping("/mess-menu/{id}")
     public ResponseEntity<MessDayMenu> updateMenuFull(
@@ -297,14 +289,12 @@ public class HostelController {
 
         return ResponseEntity.ok(hostelService.updateMenu(id, menu));
     }
-
     // DELETE MENU
     @PreAuthorize("hasAuthority('MESS_MENU_DELETE')")
     @DeleteMapping("/mess-menu/{id}")
     public ResponseEntity<String> deleteMenu(@PathVariable Long id) {
     	hostelService.deleteMenu(id);
-        return ResponseEntity.ok("Menu deleted successfully");
-    }
+        return ResponseEntity.ok("Menu deleted successfully");}
 //=================== StudentHealthIncident =================//
     
     //  CREATE HEALTH INCIDENT
@@ -436,7 +426,7 @@ public class HostelController {
     
     //=======================================StudentVisitEntry====================//
    
-    // CREATE VISIT (STUDENT)
+    // CREATE VISIT
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_CREATE')")
     @PostMapping("/visits")
     public ResponseEntity<StudentVisitEntry> createVisit(
@@ -444,7 +434,7 @@ public class HostelController {
         return ResponseEntity.ok(hostelService.createVisit(visit));
     }
 
-    // GET ALL VISITS (OPTIONAL DATE FILTER)
+    // GET ALL 
     @PreAuthorize("hasAuthority('HOSTEL_VISIT_VIEW')")
     @GetMapping("/visits")
     public ResponseEntity<List<StudentVisitEntry>> getAllVisits(

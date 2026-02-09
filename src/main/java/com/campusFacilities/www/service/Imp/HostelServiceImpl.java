@@ -13,6 +13,7 @@ import com.campusFacilities.www.model.Hostel.HostelRoom;
 import com.campusFacilities.www.model.Hostel.MessDayMenu;
 import com.campusFacilities.www.model.Hostel.StudentHealthIncident;
 import com.campusFacilities.www.model.Hostel.StudentHostelAllocation;
+import com.campusFacilities.www.model.Hostel.StudentHostelAllocation.AllocationStatus;
 import com.campusFacilities.www.model.Hostel.StudentHostelFee;
 import com.campusFacilities.www.model.Hostel.StudentVisitEntry;
 import com.campusFacilities.www.repository.Hostel.HostelAttendanceRepository;
@@ -160,47 +161,61 @@ public class HostelServiceImpl {
 	 * hostelAttedanceRepository.save(attendance); }
 	 */
     @Transactional
-    public HostelAttendance markAttendance(HostelAttendance request) 
-    {
+    public HostelAttendance markAttendance(HostelAttendance request) {
+
         if (request.getStudentId() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Student ID is required"
+                    "STUDENT_ID_REQUIRED"
             );
         }
+
         Long studentId = request.getStudentId();
         StudentHostelAllocation allocation =
-        		hostelAttedanceRepository.findByStudentId(studentId)
+        		allocationRepository
+                        .findByStudentIdAndStatus(
+                                studentId,
+                                AllocationStatus.ACTIVE
+                        )
                         .orElseThrow(() -> new ResponseStatusException(
                                 HttpStatus.BAD_REQUEST,
-                                "Please assign a room before marking attendance"
+                                "ROOM_NOT_ASSIGNED"
                         ));
-        if (allocation.getRoom() == null) {
+
+        HostelRoom room = allocation.getRoom();
+        if (room == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Please assign a room before marking attendance"
-            );}
+                    "ROOM_NOT_ASSIGNED"
+            );
+        }
+
         boolean alreadyMarked =
-        		hostelAttedanceRepository.existsByStudentIdAndAttendanceDate(
-                        studentId,
-                        LocalDate.now()
-                );
+        		hostelAttedanceRepository
+                        .existsByStudentIdAndAttendanceDate(
+                                studentId,
+                                LocalDate.now()
+                        );
+
         if (alreadyMarked) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Attendance already marked for today"
-            );}
-        HostelRoom room = allocation.getRoom();
+                    "ATTENDANCE_ALREADY_MARKED"
+            );
+        }
+
         HostelAttendance attendance = new HostelAttendance();
         attendance.setStudentId(allocation.getStudentId());
         attendance.setStudentName(allocation.getStudentName());
         attendance.setRoom(room);
         attendance.setRoomNumber(room.getRoomNumber());
-        attendance.setStatus(request.getStatus());
+        attendance.setStatus(request.getStatus()); // PRESENT / ABSENT
         attendance.setAttendanceDate(LocalDate.now());
         attendance.setMarkedAt(LocalDateTime.now());
+
         return hostelAttedanceRepository.save(attendance);
     }
+
     // GET ALL ATTENDANCE
     public List<HostelAttendance> getAllAttendance(LocalDate date) {
         if (date != null) {
@@ -275,7 +290,7 @@ public class HostelServiceImpl {
     return complaintRepository.save(existing);
 }
 
-// PATCH – UPDATE STATUS / ADMIN REMARKS ONLY
+// PATCH 
 public HostelComplaint updateComplaint(
         Long complaintId,
         HostelComplaint.ComplaintStatus status,
@@ -305,8 +320,6 @@ public HostelComplaint updateComplaint(
     	    }
         return hostelRoomRepository.save(room);
     }
-
-   
     // GET ALL ROOMS
     public List<HostelRoom> getAllRooms() {
         return hostelRoomRepository.findByIsDeletedFalse();
@@ -318,7 +331,6 @@ public HostelComplaint updateComplaint(
                 .filter(r -> !Boolean.TRUE.equals(r.getIsDeleted()))
                 .orElseThrow(() -> new RuntimeException("Room not found"));
     }
-
     // PATCH (PARTIAL UPDATE)
     public HostelRoom updateRoomPartial(Long roomId, HostelRoom request) {
         HostelRoom room = getRoomById(roomId);
@@ -338,32 +350,37 @@ public HostelComplaint updateComplaint(
         room.setStatus(status);
         return hostelRoomRepository.save(room);
     }
-
-    //Put 
+    //Put
     public HostelRoom updateRoom(Long id, HostelRoom room) {
 
         HostelRoom existingRoom = hostelRoomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        // REQUIRED FIELDS
-        existingRoom.setRoomNumber(room.getRoomNumber());
-        existingRoom.setSharingType(room.getSharingType());
-        existingRoom.setStatus(room.getStatus());
+        if (room.getRoomNumber() != null)
+            existingRoom.setRoomNumber(room.getRoomNumber());
 
-        // OPTIONAL FIELDS (safe updates)
-        existingRoom.setCurrentlyOccupied(room.getCurrentlyOccupied());
-        existingRoom.setIsDeleted(room.getIsDeleted());
+        if (room.getSharingType() != null)
+            existingRoom.setSharingType(room.getSharingType());
+
+        if (room.getStatus() != null)
+            existingRoom.setStatus(room.getStatus());
+
+        if (room.getCurrentlyOccupied() != null) {
+            existingRoom.setCurrentlyOccupied(room.getCurrentlyOccupied());
+        }
+
+        if (room.getIsDeleted() != null) {
+            existingRoom.setIsDeleted(room.getIsDeleted());
+        }
 
         return hostelRoomRepository.save(existingRoom);
     }
-    
     // SOFT DELETE
     public void deleteRoom(Long roomId) {
         HostelRoom room = getRoomById(roomId);
         room.setIsDeleted(true);
         hostelRoomRepository.save(room);
     }
-    
     //==================MessMenu===========================//
     
     public MessDayMenu createMenu(MessDayMenu menu) {
@@ -387,19 +404,15 @@ public HostelComplaint updateComplaint(
 
     //PUT 
     public MessDayMenu updateMenu(Long id, MessDayMenu menu) {
-
         MessDayMenu existingMenu = messDayMenuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mess menu not found"));
-
-        // FULL UPDATE
         existingMenu.setDay(menu.getDay());
         existingMenu.setBreakfast(menu.getBreakfast());
         existingMenu.setLunch(menu.getLunch());
         existingMenu.setDinner(menu.getDinner());
-
-        return messDayMenuRepository.save(existingMenu);
-    }
-    // PATCH (PARTIAL UPDATE)
+        return messDayMenuRepository.save(existingMenu); }
+    
+    // PATCH 
     public MessDayMenu updateMenuPartial(Long menuId, MessDayMenu request) {
         MessDayMenu menu = getMenuById(menuId);
 
@@ -414,14 +427,12 @@ public HostelComplaint updateComplaint(
 
         return messDayMenuRepository.save(menu);
     }
-
-    // DELETE MENU
+    // DELETE
     public void deleteMenu(Long menuId) {
         messDayMenuRepository.deleteById(menuId);
     }
-
     
-    //================StudentHealthIncidentService===================//
+    //================StudentHealth==================================================//
     
     // CREATE INCIDENT
     public StudentHealthIncident createIncident(StudentHealthIncident incident) {
@@ -575,7 +586,6 @@ public HostelComplaint updateComplaint(
         studentFeeRepository.save(fee);
     }
 
-    
     // ================= StudentHostelAllocationService=================
 
      // CREATE ALLOCATION

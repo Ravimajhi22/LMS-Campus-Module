@@ -17,7 +17,6 @@ public class MessDayMenu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long menuId;
 
-
     @Enumerated(EnumType.STRING)
     private DayOfWeek day;
 

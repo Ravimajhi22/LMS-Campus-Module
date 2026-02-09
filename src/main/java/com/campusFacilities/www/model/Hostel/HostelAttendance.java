@@ -16,13 +16,14 @@ import lombok.Data;
 
 @Entity
 @Data
-public class HostelAttendance {
-	
+public class HostelAttendance 
+{
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendanceId;
 
     // ---------------- Student Info  ----------------
+	
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
@@ -30,6 +31,7 @@ public class HostelAttendance {
     private String studentName;
 
     // ---------------- Room Info ----------------
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable =false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -39,13 +41,15 @@ public class HostelAttendance {
     private String roomNumber;
 
     // ---------------- Attendance ----------------
+    
     @Column(name = "attendance_date", nullable = false)
     private LocalDate attendanceDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceStatus status;
-    public enum AttendanceStatus {
+    public enum AttendanceStatus 
+    {
         PRESENT,
         ABSENT
     }
@@ -53,8 +57,5 @@ public class HostelAttendance {
     // ---------------- Audit ----------------
     @Column(name = "marked_at", nullable = false)
     private LocalDateTime markedAt;
-
-	
-
 
 }
