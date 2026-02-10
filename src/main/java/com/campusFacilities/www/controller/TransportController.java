@@ -1,5 +1,7 @@
 package com.campusFacilities.www.controller;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,14 +13,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
+import com.campusFacilities.www.model.Transport.FuelLog;
 import com.campusFacilities.www.model.Transport.RouteWay;
+import com.campusFacilities.www.model.Transport.StudentTransportAssignment;
 import com.campusFacilities.www.model.Transport.TransportAttendance;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
+import com.campusFacilities.www.model.Transport.VehicleMaintenance;
 import com.campusFacilities.www.service.Imp.TransportService;
 
 import lombok.RequiredArgsConstructor;
@@ -70,6 +75,7 @@ public class TransportController {
         transportService.deleteVehicle(vehicleNumber);
         return ResponseEntity.ok("Vehicle deleted successfully");
     }
+    
     /* =====================================================
                                  ROUTEWAY
          * ===================================================== */
@@ -114,6 +120,7 @@ public class TransportController {
         transportService.deleteRoute(routeCode);
         return ResponseEntity.ok("Route deleted successfully");
     }
+    
         /* =====================================================
                             DRIVER DETAILS
          * ===================================================== */
@@ -232,25 +239,217 @@ public class TransportController {
                            TRANSPORT ATTENDANCE
          * ===================================================== */
        
-        //Generate QR Code
-        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_ADD')")
-        @GetMapping(value = "/qr/{vehicleId}", produces = "image/png")
-        public byte[] generateQR(
-                @PathVariable Long vehicleId,
-                @RequestParam String type) {
-     
-            return transportService.generateVehicleQR(vehicleId, type);
-        }
-        // Scan QR (Student Side)
-        @PreAuthorize("hasRole('STUDENT')")
-        @PostMapping("/scan")       
-        public ResponseEntity<TransportAttendance> scanQR(
-                @PathVariable Long studentId,
-                @RequestBody String qrText) {
+		/*
+		 * //Generate QR Code
+		 * 
+		 * @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_ADD')")
+		 * 
+		 * @GetMapping(value = "/qr/{vehicleId}", produces = "image/png") public byte[]
+		 * generateQR(
+		 * 
+		 * @PathVariable Long vehicleId,
+		 * 
+		 * @RequestParam String type) {
+		 * 
+		 * return transportService.generateVehicleQR(vehicleId, type); } // Scan QR
+		 * (Student Side)
+		 * 
+		 * @PreAuthorize("hasRole('STUDENT')")
+		 * 
+		 * @PostMapping("/scan") public ResponseEntity<TransportAttendance> scanQR(
+		 * 
+		 * @PathVariable Long studentId,
+		 * 
+		 * @RequestBody String qrText) {
+		 * 
+		 * return ResponseEntity.ok( transportService.markAttendance(studentId, qrText)
+		 * ); }
+		 */
+        @PostMapping
+        public ResponseEntity<TransportAttendance> markAttendance(
+                @RequestBody TransportAttendance attendance) {
 
             return ResponseEntity.ok(
-                    transportService.markAttendance(studentId, qrText)
+            		transportService.createOrUpdateAttendance(attendance)
             );
         }
+    
+        //=======================================StudentVehicleAssign========================//
+        
+     // CREATE
+     @PreAuthorize("hasAnyAuthority('ASSIGNMENT_ADD')")
+     @PostMapping("/assignments")
+     public ResponseEntity<StudentTransportAssignment> addAssignment(
+             @RequestBody StudentTransportAssignment assignment) {
 
+         return ResponseEntity.ok(
+                 transportService.addStudentTransportAssignment(assignment));
+     }
+
+     // READ – ALL (Admin, Instructor only)
+     @PreAuthorize("hasAnyAuthority('ASSIGNMENT_VIEW')")
+     @GetMapping("/assignments")
+     public ResponseEntity<List<StudentTransportAssignment>> getAllAssignments() {
+
+         return ResponseEntity.ok(
+                 transportService.getAllStudentTransportAssignments());
+     }
+
+     // READ – BY STUDENT (Admin, Instructor, Parent, Student)
+     @PreAuthorize("hasAnyAuthority('ASSIGNMENT_VIEW')")
+     @GetMapping("/assignments/student/{studentId}")
+     public ResponseEntity<List<StudentTransportAssignment>> getAssignmentsByStudent(
+             @PathVariable Long studentId) {
+    	 
+         return ResponseEntity.ok(
+                 transportService.getStudentAssignments(studentId));
+     }
+
+     // UPDATE
+     @PreAuthorize("hasAnyAuthority('ASSIGNMENT_UPDATE')")
+     @PutMapping("/assignments/{id}")
+     public ResponseEntity<StudentTransportAssignment> updateAssignment(
+             @PathVariable Long id,
+             @RequestBody StudentTransportAssignment assignment) {
+
+         return ResponseEntity.ok(
+                 transportService.updateStudentTransportAssignment(id, assignment));
+     }
+
+     // PATCH
+     @PreAuthorize("hasAnyAuthority('ASSIGNMENT_UPDATE')")
+     @PatchMapping("/assignments/{id}")
+     public ResponseEntity<StudentTransportAssignment> patchAssignment(
+             @PathVariable Long id,
+             @RequestBody StudentTransportAssignment assignment) {
+
+         return ResponseEntity.ok(
+                 transportService.patchStudentTransportAssignment(id, assignment));
+     }
+
+     // DELETE (ADMIN ONLY)
+     @PreAuthorize("hasAuthority('ASSIGNMENT_DELETE')")
+     @DeleteMapping("/assignments/{id}")
+     public ResponseEntity<String> deleteAssignment(@PathVariable Long id) {
+
+         transportService.deleteStudentTransportAssignment(id);
+         return ResponseEntity.ok("Assignment deleted successfully");
+     }
+
+        
+     /* ===================== FUEL LOGS ===================== */
+
+  // CREATE
+  @PreAuthorize("hasAuthority('FUEL_ADD')")
+  @PostMapping("/fuel")
+  public ResponseEntity<FuelLog> addFuel(@RequestBody FuelLog fuelLog) {
+
+      return ResponseEntity.ok(
+              transportService.addFuelLog(fuelLog));
+  }
+
+  // READ – ALL
+  @PreAuthorize("hasAuthority('FUEL_VIEW')")
+  @GetMapping("/fuel")
+  public ResponseEntity<List<FuelLog>> getAllFuelLogs() {
+
+      return ResponseEntity.ok(
+              transportService.getAllFuelLogs());
+  }
+
+  // READ – BY VEHICLE
+  @PreAuthorize("hasAuthority('FUEL_VIEW')")
+  @GetMapping("/fuel/vehicle/{vehicleId}")
+  public ResponseEntity<List<FuelLog>> getFuelByVehicle(
+          @PathVariable String vehicleId) {
+
+      return ResponseEntity.ok(
+              transportService.getFuelLogsByVehicle(vehicleId));
+  }
+
+  // UPDATE
+  @PreAuthorize("hasAuthority('FUEL_UPDATE')")
+  @PutMapping("/fuel/{id}")
+  public ResponseEntity<@Nullable Object> updateFuel(
+          @PathVariable Long id,
+          @RequestBody FuelLog fuelLog) {
+
+      return ResponseEntity.ok(
+              transportService.updateFuelLog(id, fuelLog));
+  }
+
+  // DELETE (ADMIN ONLY)
+  @PreAuthorize("hasAuthority('FUEL_DELETE')")
+  @DeleteMapping("/fuel/{id}")
+  public ResponseEntity<String> deleteFuel(@PathVariable Long id) {
+
+      transportService.deleteFuelLog(id);
+      return ResponseEntity.ok("Fuel log deleted successfully");
+  }
+
+        
+  /* ===================== TRANSPORT MAINTENANCE ===================== */
+
+//CREATE
+@PreAuthorize("hasAuthority('MAINTENANCE_ADD')")
+@PostMapping("/maintenance")
+public ResponseEntity<VehicleMaintenance> addMaintenance(
+       @RequestBody VehicleMaintenance maintenance) {
+
+   return ResponseEntity.ok(
+           transportService.addMaintenance(maintenance));
 }
+
+//READ – ALL
+@PreAuthorize("hasAuthority('MAINTENANCE_VIEW')")
+@GetMapping("/maintenance")
+public ResponseEntity<List<VehicleMaintenance>> getAllMaintenance() {
+
+   return ResponseEntity.ok(
+           transportService.getAllMaintenance());
+}
+
+//READ – BY VEHICLE
+@PreAuthorize("hasAuthority('MAINTENANCE_VIEW')")
+@GetMapping("/maintenance/vehicle/{vehicleId}")
+public ResponseEntity<List<VehicleMaintenance>> getMaintenanceByVehicle(
+       @PathVariable String vehicleId) {
+
+   return ResponseEntity.ok(
+           transportService.getMaintenanceByVehicle(vehicleId));
+}
+
+//UPDATE
+@PreAuthorize("hasAuthority('MAINTENANCE_UPDATE')")
+@PutMapping("/maintenance/{id}")
+public ResponseEntity<VehicleMaintenance> updateMaintenance(
+       @PathVariable Long id,
+       @RequestBody VehicleMaintenance maintenance) {
+
+   return ResponseEntity.ok(
+           transportService.updateMaintenance(id, maintenance));
+}
+
+//PATCH
+@PreAuthorize("hasAuthority('MAINTENANCE_UPDATE')")
+@PatchMapping("/maintenance/{id}")
+public ResponseEntity<VehicleMaintenance> patchMaintenance(
+       @PathVariable Long id,
+       @RequestBody VehicleMaintenance maintenance) {
+
+   return ResponseEntity.ok(
+           transportService.patchMaintenance(id, maintenance));
+}
+
+//DELETE 
+@PreAuthorize("hasAuthority('MAINTENANCE_DELETE')")
+@DeleteMapping("/maintenance/{id}")
+public ResponseEntity<String> deleteMaintenance(@PathVariable Long id) {
+
+   transportService.deleteMaintenance(id);
+   return ResponseEntity.ok("Maintenance record deleted successfully");
+}
+}
+    
+
+

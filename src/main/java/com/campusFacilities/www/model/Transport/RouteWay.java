@@ -26,9 +26,9 @@ import lombok.ToString;
 public class RouteWay 
 
 {
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;;
     
     @Column(name = "route_Code")
     private Long routeCode;

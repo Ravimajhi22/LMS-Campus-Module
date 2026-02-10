@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,61 +13,53 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-@Entity
+    @Entity
 	@Table(name = "transport_attendance")
 	@Data
 	public class TransportAttendance {
 
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
+    	@Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-	    /* ================= STUDENT ================= */
-	   
-	    private Long studentId;
+        @Column(name = "student_id", nullable = false)
+        private Long studentId;
 
-	    /* ================= VEHICLE (BY VEHICLE NUMBER) ================= */
-	   
-	    @ManyToOne(fetch = FetchType.LAZY)
-	    @JoinColumn(name = "vehicle_id", nullable = false) 
-	    private Vehicle vehicle;
+        @Column(name = "attendance_date", nullable = false)
+        private LocalDate attendanceDate;
 
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private MarkedBy markedBy;
 
-	    /* ================= DATE ================= */
-	    @Column(name = "attendance_date", nullable = false)
-	    private LocalDate attendanceDate;
-	   
-	    @Enumerated(EnumType.STRING)
-	    private MarkedBy markedBy;
-	    
-	    public enum MarkedBy {
-	        MANUAL,
-	        QRCODE
-	    }
+        @ManyToOne(optional = false)
+        @JoinColumn(name = "route_id")
+        private RouteWay route;
 
-	    @Enumerated(EnumType.STRING)
-	    private TransportAttendanceStatus pickupStatus;
-	    public enum TransportAttendanceStatus 
-	    {
-	        PICKED_UP,
-	        DROPPED,
-	        ABSENT,
-	        SKIPPED
-	    }
+        @ManyToOne(optional = false)
+        @JoinColumn(name = "vehicle_id")
+        private Vehicle vehicle;
 
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private PickupStatus pickupStatus;
 
-	    @Enumerated(EnumType.STRING)
-	    private TransportAttendanceStatus dropStatus;
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        private DropStatus dropStatus;
 
+        /* ================= ENUMS ================= */
 
-		public void save(TransportAttendance attendance) {
-			
-			
-		}
+        public enum MarkedBy {
+            MANUAL, QRCODE
+        }
 
+        public enum PickupStatus {
+            PICKED_UP, DROPPED, ABSENT, SKIPPED
+        }
 
-		public void setRoute(RouteWay orElseThrow) {
-			
-		}
-	}
+        public enum DropStatus {
+            DROPPED, ABSENT, SKIPPED
+        }
+    }
 

@@ -1,23 +1,28 @@
 package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.campusFacilities.www.Transport.util.QRCodeUtil;
+
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
+import com.campusFacilities.www.model.Transport.FuelLog;
 import com.campusFacilities.www.model.Transport.RouteWay;
+import com.campusFacilities.www.model.Transport.StudentTransportAssignment;
 import com.campusFacilities.www.model.Transport.TransportAttendance;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
+import com.campusFacilities.www.model.Transport.VehicleMaintenance;
 import com.campusFacilities.www.repository.Transport.ConductorDetailsRepository;
 import com.campusFacilities.www.repository.Transport.DriverDetailsRepository;
+import com.campusFacilities.www.repository.Transport.FuelLogRepository;
 import com.campusFacilities.www.repository.Transport.RouteWayRepository;
+import com.campusFacilities.www.repository.Transport.StudentTransportAssignmentRepository;
 import com.campusFacilities.www.repository.Transport.TransportAttendanceRepository;
 import com.campusFacilities.www.repository.Transport.VehicleGPSRepository;
+import com.campusFacilities.www.repository.Transport.VehicleMaintenanceRepository;
 import com.campusFacilities.www.repository.Transport.VehicleRepository;
 
 @Service
@@ -40,6 +45,16 @@ public class TransportService {
 
     @Autowired
     private TransportAttendanceRepository attendanceRepository;
+    
+    @Autowired
+    private StudentTransportAssignmentRepository studentTransportAssignRepo;
+    
+    @Autowired
+    private FuelLogRepository fuelLogRepository;
+    
+    
+    @Autowired
+    private VehicleMaintenanceRepository maintenanceRepository;
     
     /* ================= VEHICLE ===================== */
 
@@ -369,68 +384,355 @@ public class TransportService {
     /* ============================== TRANSPORT ATTENDANCE ===================================== */
 
     
-    // 🔹 Generate Daily QR for Vehicle
-    public byte[] generateVehicleQR(Long vehicleId, String type) {
+	/*
+	 * // 🔹 Generate Daily QR for Vehicle public byte[] generateVehicleQR(Long
+	 * vehicleId, String type) {
+	 * 
+	 * String qrText = "vehicleId=" + vehicleId + "|date=" + LocalDate.now() +
+	 * "|type=" + type;
+	 * 
+	 * return QRCodeUtil.generateQRCode(qrText); }
+	 * 
+	 * // Scan QR and Mark Attendance public TransportAttendance markAttendance(Long
+	 * studentId, String qrText) {
+	 * 
+	 * Map<String, String> qrData = parseQRText(qrText);
+	 * 
+	 * Long vehicleId = Long.parseLong(qrData.get("vehicleId")); LocalDate date =
+	 * LocalDate.parse(qrData.get("date")); String type = qrData.get("type");
+	 * 
+	 * Vehicle vehicle = vehicleRepository.findById(vehicleId) .orElseThrow(() ->
+	 * new RuntimeException("Vehicle not found"));
+	 * 
+	 * TransportAttendance attendance = attendanceRepository
+	 * .findByStudentIdAndVehicleAndAttendanceDate( studentId, vehicle, date )
+	 * .orElse(new TransportAttendance());
+	 * 
+	 * attendance.setStudentId(studentId); attendance.setVehicle(vehicle);
+	 * attendance.setAttendanceDate(date);
+	 * attendance.setMarkedBy(TransportAttendance.MarkedBy.QRCODE);
+	 * 
+	 * if ("PICKUP".equalsIgnoreCase(type)) { attendance.setPickupStatus(
+	 * TransportAttendance.TransportAttendanceStatus.PICKED_UP); } else if
+	 * ("DROP".equalsIgnoreCase(type)) { attendance.setDropStatus(
+	 * TransportAttendance.TransportAttendanceStatus.DROPPED); }
+	 * 
+	 * return attendanceRepository.save(attendance); }
+	 * 
+	 * // QR Text Parser
+	 * 
+	 * private Map<String, String> parseQRText(String qrText) { Map<String, String>
+	 * map = new HashMap<>(); String[] parts = qrText.split("\\|");
+	 * 
+	 * for (String part : parts) { String[] keyValue = part.split("=");
+	 * map.put(keyValue[0], keyValue[1]); } return map; }
+	 * 
+	 * 
+	 * public @Nullable Object markAttendanceFromToken(String qrText) {
+	 * 
+	 * return null; }
+	 */
+    
+    /**
+     * CREATE or UPDATE attendance
+     * based on studentId + attendanceDate
+     */
+    public TransportAttendance createOrUpdateAttendance(
+            TransportAttendance request) {
 
-        String qrText =
-                "vehicleId=" + vehicleId +
-                "|date=" + LocalDate.now() +
-                "|type=" + type;
+        // ---------- Basic validations ----------
+        if (request.getStudentId() == null)
+            throw new RuntimeException("Student ID is required");
 
-        return QRCodeUtil.generateQRCode(qrText);
-    }
+        if (request.getAttendanceDate() == null)
+            throw new RuntimeException("Attendance date is required");
 
-    // Scan QR and Mark Attendance
-    public TransportAttendance markAttendance(Long studentId, String qrText) {
+        if (request.getMarkedBy() == null)
+            throw new RuntimeException("MarkedBy is required");
 
-        Map<String, String> qrData = parseQRText(qrText);
+        if (request.getRoute() == null || request.getRoute().getId() == null)
+            throw new RuntimeException("Route is required");
 
-        Long vehicleId = Long.parseLong(qrData.get("vehicleId"));
-        LocalDate date = LocalDate.parse(qrData.get("date"));
-        String type = qrData.get("type");
+        if (request.getVehicle() == null || request.getVehicle().getId() == null)
+            throw new RuntimeException("Vehicle is required");
 
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+        // ---------- Validate foreign keys ----------
+        RouteWay route = routeWayRepository.findById(request.getRoute().getId())
+                .orElseThrow(() -> new RuntimeException("Route not found"));
+
+        Vehicle vehicle = vehicleRepository.findById(request.getVehicle().getId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
+        // ---------- Find existing record ----------
         TransportAttendance attendance =
                 attendanceRepository
-                        .findByStudentIdAndVehicleAndAttendanceDate(
-                                studentId, vehicle, date
+                        .findByStudentIdAndAttendanceDate(
+                                request.getStudentId(),
+                                request.getAttendanceDate()
                         )
                         .orElse(new TransportAttendance());
 
-        attendance.setStudentId(studentId);
+        // ---------- Map required fields ----------
+        attendance.setStudentId(request.getStudentId());
+        attendance.setAttendanceDate(request.getAttendanceDate());
+        attendance.setMarkedBy(request.getMarkedBy());
+        attendance.setRoute(route);
         attendance.setVehicle(vehicle);
-        attendance.setAttendanceDate(date);
-        attendance.setMarkedBy(TransportAttendance.MarkedBy.QRCODE);
 
-        if ("PICKUP".equalsIgnoreCase(type)) {
+        // ---------- Default handling ----------
+        if (request.getPickupStatus() != null) {
+            attendance.setPickupStatus(request.getPickupStatus());
+        } else if (attendance.getPickupStatus() == null) {
             attendance.setPickupStatus(
-                    TransportAttendance.TransportAttendanceStatus.PICKED_UP);
-        } else if ("DROP".equalsIgnoreCase(type)) {
+                    TransportAttendance.PickupStatus.ABSENT);
+        }
+
+        if (request.getDropStatus() != null) {
+            attendance.setDropStatus(request.getDropStatus());
+        } else if (attendance.getDropStatus() == null) {
             attendance.setDropStatus(
-                    TransportAttendance.TransportAttendanceStatus.DROPPED);
+                    TransportAttendance.DropStatus.ABSENT);
         }
 
         return attendanceRepository.save(attendance);
     }
 
-    // QR Text Parser
-    
-    private Map<String, String> parseQRText(String qrText) {
-        Map<String, String> map = new HashMap<>();
-        String[] parts = qrText.split("\\|");
+	/* ========================== STUDENT TRANSPORT ASSIGNMENT ========================== */
+	
+	public StudentTransportAssignment addStudentTransportAssignment(
+	        StudentTransportAssignment assignment)
+	{
+	    if (assignment.getShift() == null) 
+	    {
+	        assignment.setShift(StudentTransportAssignment.Shift.Morning);
+	    }
+	    if (assignment.getVehicle() != null && assignment.getVehicle().getId() != null) {
+	        Vehicle vehicle = vehicleRepository
+	                .findById(assignment.getVehicle().getId())
+	                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+	        assignment.setVehicle(vehicle);
+	    }
+	    if (assignment.getRoute() != null && assignment.getRoute().getId() != null) {
+	        RouteWay route = routeWayRepository
+	                .findById(assignment.getRoute().getId())
+	                .orElseThrow(() -> new RuntimeException("Route not found"));
+	        assignment.setRoute(route);
+	    }
+	    return studentTransportAssignRepo.save(assignment);
+	}
 
-        for (String part : parts) {
-            String[] keyValue = part.split("=");
-            map.put(keyValue[0], keyValue[1]);
-        }
-        return map;
-    }
+	//Get
+	
+	public List<StudentTransportAssignment> getAllStudentTransportAssignments() {
+	    return studentTransportAssignRepo.findAll();
+	}
+
+	public List<StudentTransportAssignment> getStudentAssignments(Long studentId) {
+	    return studentTransportAssignRepo.findByStudentId(studentId);
+	}
+
+	public List<StudentTransportAssignment> getVehicleAssignments(Long vehicleId) {
+	    return studentTransportAssignRepo.findByVehicle_Id(vehicleId);
+	}
+
+	public StudentTransportAssignment getStudentTransportAssignmentById(Long id) {
+	    return studentTransportAssignRepo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Student transport assignment not found"));
+	}
+    //Update
+	public StudentTransportAssignment updateStudentTransportAssignment(
+	        Long id,
+	        StudentTransportAssignment assignment) {
+
+	    StudentTransportAssignment existing =
+	            getStudentTransportAssignmentById(id);
+
+	    existing.setStudentId(assignment.getStudentId());
+	    existing.setPickupPoint(assignment.getPickupPoint());
+	    existing.setDropPoint(assignment.getDropPoint());
+	    existing.setShift(assignment.getShift());
+
+	    if (assignment.getVehicle() != null && assignment.getVehicle().getId() != null) {
+	        Vehicle vehicle = vehicleRepository
+	                .findById(assignment.getVehicle().getId())
+	                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+	        existing.setVehicle(vehicle);
+	    }
+
+	    if (assignment.getRoute() != null && assignment.getRoute().getId() != null) {
+	        RouteWay route = routeWayRepository
+	                .findById(assignment.getRoute().getId())
+	                .orElseThrow(() -> new RuntimeException("Route not found"));
+	        existing.setRoute(route);
+	    }
+
+	    return studentTransportAssignRepo.save(existing);
+	}
+	//Patch
+	public StudentTransportAssignment patchStudentTransportAssignment(
+	        Long id,
+	        StudentTransportAssignment assignment) {
+
+	    StudentTransportAssignment existing =
+	            getStudentTransportAssignmentById(id);
+
+	    if (assignment.getStudentId() != null)
+	        existing.setStudentId(assignment.getStudentId());
+
+	    if (assignment.getPickupPoint() != null)
+	        existing.setPickupPoint(assignment.getPickupPoint());
+
+	    if (assignment.getDropPoint() != null)
+	        existing.setDropPoint(assignment.getDropPoint());
+
+	    if (assignment.getShift() != null)
+	        existing.setShift(assignment.getShift());
+
+	    if (assignment.getVehicle() != null && assignment.getVehicle().getId() != null) {
+	        Vehicle vehicle = vehicleRepository
+	                .findById(assignment.getVehicle().getId())
+	                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+	        existing.setVehicle(vehicle);
+	    }
+
+	    if (assignment.getRoute() != null && assignment.getRoute().getId() != null) {
+	        RouteWay route = routeWayRepository
+	                .findById(assignment.getRoute().getId())
+	                .orElseThrow(() -> new RuntimeException("Route not found"));
+	        existing.setRoute(route);
+	    }
+
+	    return studentTransportAssignRepo.save(existing);
+	}
+	//Delete
+	public void deleteStudentTransportAssignment(Long id) {
+		studentTransportAssignRepo.delete(
+	            getStudentTransportAssignmentById(id)
+	    );
+	}
+	
+	/* ========================== FUEL LOG ========================== */
+
+	public FuelLog addFuelLog(FuelLog fuelLog) {
+
+	    if (fuelLog.getDate() == null) {
+	        fuelLog.setDate(LocalDate.now());
+	    }
+
+	    if (fuelLog.getQuantity() <= 0) {
+	        throw new RuntimeException("Fuel quantity must be greater than zero");
+	    }
+
+	    if (fuelLog.getCost() <= 0) {
+	        throw new RuntimeException("Fuel cost must be greater than zero");
+	    }
+
+	    return fuelLogRepository.save(fuelLog);
+	}
+
+	public List<FuelLog> getAllFuelLogs() {
+	    return fuelLogRepository.findAll();
+	}
+
+	public List<FuelLog> getFuelLogsByVehicle(String vehicleId) {
+	    return fuelLogRepository.findByVehicleId(vehicleId);
+	}
+
+	public List<FuelLog> getFuelLogsByDate(LocalDate date) {
+	    return fuelLogRepository.findByDate(date);
+	}
+
+	public FuelLog getFuelLogById(Long id) {
+	    return fuelLogRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Fuel log not found"));
+	}
+
+	public void deleteFuelLog(Long id) {
+	    fuelLogRepository.delete(getFuelLogById(id));
+	}
 
 
-	public @Nullable Object markAttendanceFromToken(String qrText) {
-		
+	/* ========================== VEHICLE MAINTENANCE ========================== */
+
+	public VehicleMaintenance addMaintenance(VehicleMaintenance maintenance) {
+
+	    if (maintenance.getDate() == null) {
+	        maintenance.setDate(LocalDate.now());
+	    }
+
+	    if (maintenance.getStatus() == null) {
+	        maintenance.setStatus(
+	                VehicleMaintenance.MaintenanceStatus.Pending);
+	    }
+
+	    return maintenanceRepository.save(maintenance);
+	}
+
+	public List<VehicleMaintenance> getAllMaintenance() {
+	    return maintenanceRepository.findAll();
+	}
+
+	public VehicleMaintenance getMaintenanceById(Long id) {
+	    return maintenanceRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Maintenance record not found"));
+	}
+
+	public List<VehicleMaintenance> getMaintenanceByVehicle(String vehicleId) {
+	    return maintenanceRepository.findByVehicleId(vehicleId);
+	}
+
+	public VehicleMaintenance updateMaintenance(
+	        Long id,
+	        VehicleMaintenance maintenance) {
+
+	    VehicleMaintenance existing = getMaintenanceById(id);
+
+	    existing.setVehicleId(maintenance.getVehicleId());
+	    existing.setType(maintenance.getType());
+	    existing.setDate(maintenance.getDate());
+	    existing.setCost(maintenance.getCost());
+	    existing.setDescription(maintenance.getDescription());
+	    existing.setStatus(maintenance.getStatus());
+	    existing.setNextDue(maintenance.getNextDue());
+
+	    return maintenanceRepository.save(existing);
+	}
+
+	public VehicleMaintenance patchMaintenance(
+	        Long id,
+	        VehicleMaintenance maintenance) {
+
+	    VehicleMaintenance existing = getMaintenanceById(id);
+
+	    if (maintenance.getType() != null)
+	        existing.setType(maintenance.getType());
+
+	    if (maintenance.getDate() != null)
+	        existing.setDate(maintenance.getDate());
+
+	    if (maintenance.getCost() != null)
+	        existing.setCost(maintenance.getCost());
+
+	    if (maintenance.getDescription() != null)
+	        existing.setDescription(maintenance.getDescription());
+
+	    if (maintenance.getStatus() != null)
+	        existing.setStatus(maintenance.getStatus());
+
+	    if (maintenance.getNextDue() != null)
+	        existing.setNextDue(maintenance.getNextDue());
+
+	    return maintenanceRepository.save(existing);
+	}
+
+	public void deleteMaintenance(Long id) {
+	    maintenanceRepository.delete(getMaintenanceById(id));
+	}
+
+
+	public @Nullable Object updateFuelLog(Long id, FuelLog fuelLog) {
+		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

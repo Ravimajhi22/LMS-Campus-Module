@@ -1,7 +1,5 @@
 package com.campusFacilities.www.model.Transport;
-
 import lombok.Data;
-
 @Data
 public class QRAttendanceRequest {
 
