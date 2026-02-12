@@ -1,5 +1,6 @@
 package com.campusFacilities.www.model.Transport;
 import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -65,7 +66,6 @@ public class DriverDetails
 	    
 	    @Enumerated(EnumType.STRING)
 	    private LicenseValidityStatus licenseValidityStatus;
-
 	    public enum LicenseValidityStatus {
 	        VALID,
 	        EXPIRED,
@@ -76,7 +76,6 @@ public class DriverDetails
 	    @Column(nullable = false)
 	   
 	    private DriverStatus verificationStatus;
-	   
 	    public enum DriverStatus {
 	        PENDING,
 	        VERIFIED,

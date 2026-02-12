@@ -12,13 +12,13 @@ import com.campusFacilities.www.model.Transport.VehicleGPS;
 public interface VehicleGPSRepository
         extends JpaRepository<VehicleGPS, Long> 
 { 
-    List<VehicleGPS> findByVehicle_Id(Long vehicleId);
+	   // Full history
+    List<VehicleGPS> findByVehicle_IdOrderByTimestampDesc(Long vehicleId);
 
-   
-    List<VehicleGPS> findByVehicle_VehicleNumber(String vehicleNumber);
-
-  
+    // Latest record
     Optional<VehicleGPS> findTopByVehicle_IdOrderByTimestampDesc(Long vehicleId);
-    
+
+    // By vehicle number
+    List<VehicleGPS> findByVehicle_VehicleNumber(String vehicleNumber);
 }
 

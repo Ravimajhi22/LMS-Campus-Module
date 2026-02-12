@@ -25,8 +25,8 @@ public class FuelLog {
     private LocalDate date;
 
     @Column(nullable = false)
-    private Double quantity; // liters
-
+    private Double quantity; 
+    
     @Column(nullable = false)
     private Double cost;
 

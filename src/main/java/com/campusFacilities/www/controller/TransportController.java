@@ -1,7 +1,6 @@
 package com.campusFacilities.www.controller;
 import java.util.List;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.campusFacilities.www.model.Transport.ConductorDetails;
@@ -76,7 +76,7 @@ public class TransportController {
         return ResponseEntity.ok("Vehicle deleted successfully");
     }
     
-    /* =====================================================
+         /* =====================================================
                                  ROUTEWAY
          * ===================================================== */
     
@@ -221,19 +221,45 @@ public class TransportController {
                                 VEHICLE GPS
          * ===================================================== */
    
-        @PreAuthorize("hasAuthority('GPS_ADD')")
-        @PostMapping("/gps")
-        public ResponseEntity<VehicleGPS> saveLocation(@RequestBody VehicleGPS gps)
-        {
-            return ResponseEntity.ok(transportService.saveLocation(gps));
-        }
-        @PreAuthorize("hasAuthority('GPS_VIEW')")
-        @GetMapping("/gps/latest/{vehicleId}")
-        public ResponseEntity<VehicleGPS> getLatestLocation(
-                @PathVariable Long vehicleId) {
-            return ResponseEntity.ok(
-                    transportService.getLatestLocation(vehicleId));
-        }
+    @PreAuthorize("hasAuthority('GPS_ADD')")
+    @PostMapping("/gps")
+    public ResponseEntity<String> sendGpsData(
+            @RequestParam Long vehicleId,
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double speed) {
+
+    	transportService.sendGpsToKafka(
+                vehicleId,
+                latitude,
+                longitude,
+                speed
+        );
+
+        return ResponseEntity.ok("GPS Data Sent to Kafka Successfully");
+    }
+    
+    @PreAuthorize("hasAuthority('GPS_VIEW')")
+    @GetMapping("/gps/latest/{vehicleId}")
+    public ResponseEntity<VehicleGPS> getLatestLocation(
+            @PathVariable Long vehicleId) {
+
+        return ResponseEntity.ok(
+        		transportService.getLatestLocation(vehicleId)
+        );
+    }
+
+
+
+ @PreAuthorize("hasAuthority('GPS_VIEW')")
+ @GetMapping("/gps/history/{vehicleId}")
+ public ResponseEntity<List<VehicleGPS>> getVehicleHistory(
+         @PathVariable Long vehicleId) {
+
+     return ResponseEntity.ok(
+    		 transportService.getVehicleHistory(vehicleId)
+     );
+  }
         
         /* =====================================================
                            TRANSPORT ATTENDANCE
@@ -265,13 +291,46 @@ public class TransportController {
 		 * return ResponseEntity.ok( transportService.markAttendance(studentId, qrText)
 		 * ); }
 		 */
-        @PostMapping
+  //=====================Manual Attendance===========================================//
+        
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_ADD')")
+        @PostMapping("/attendance")
         public ResponseEntity<TransportAttendance> markAttendance(
                 @RequestBody TransportAttendance attendance) {
 
             return ResponseEntity.ok(
-            		transportService.createOrUpdateAttendance(attendance)
+                    transportService.createOrUpdateAttendance(attendance)
             );
+        }
+        
+     //Get
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_VIEW')")
+        @GetMapping("/attendances")
+        public ResponseEntity<List<TransportAttendance>> getAllAttendance() {
+
+            return ResponseEntity.ok(
+                    transportService.getAllAttendance()
+            );
+        }
+       //Update
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_UPDATE')")
+        @PutMapping("/attendance/{id}")
+        public ResponseEntity<TransportAttendance> updateAttendance(
+                @PathVariable Long id,
+                @RequestBody TransportAttendance attendance) {
+
+            return ResponseEntity.ok(
+                    transportService.updateAttendance(id, attendance)
+            );
+        }
+        //Delete
+        @PreAuthorize("hasAuthority('TRANSPORT_ATTENDANCE_DELETE')")
+        @DeleteMapping("/attendance/{id}")
+        public ResponseEntity<String> deleteAttendance(
+                @PathVariable Long id) {
+
+            transportService.deleteAttendance(id);
+            return ResponseEntity.ok("Transport attendance deleted successfully");
         }
     
         //=======================================StudentVehicleAssign========================//
@@ -335,7 +394,6 @@ public class TransportController {
          transportService.deleteStudentTransportAssignment(id);
          return ResponseEntity.ok("Assignment deleted successfully");
      }
-
         
      /* ===================== FUEL LOGS ===================== */
 
@@ -347,7 +405,6 @@ public class TransportController {
       return ResponseEntity.ok(
               transportService.addFuelLog(fuelLog));
   }
-
   // READ – ALL
   @PreAuthorize("hasAuthority('FUEL_VIEW')")
   @GetMapping("/fuel")
@@ -356,7 +413,6 @@ public class TransportController {
       return ResponseEntity.ok(
               transportService.getAllFuelLogs());
   }
-
   // READ – BY VEHICLE
   @PreAuthorize("hasAuthority('FUEL_VIEW')")
   @GetMapping("/fuel/vehicle/{vehicleId}")
@@ -366,17 +422,18 @@ public class TransportController {
       return ResponseEntity.ok(
               transportService.getFuelLogsByVehicle(vehicleId));
   }
-
   // UPDATE
-  @PreAuthorize("hasAuthority('FUEL_UPDATE')")
-  @PutMapping("/fuel/{id}")
-  public ResponseEntity<@Nullable Object> updateFuel(
-          @PathVariable Long id,
-          @RequestBody FuelLog fuelLog) {
-
-      return ResponseEntity.ok(
-              transportService.updateFuelLog(id, fuelLog));
-  }
+	/*
+	 * @PreAuthorize("hasAuthority('FUEL_UPDATE')")
+	 * 
+	 * @PutMapping("/fuel/{id}") public ResponseEntity<@Nullable Object> updateFuel(
+	 * 
+	 * @PathVariable Long id,
+	 * 
+	 * @RequestBody FuelLog fuelLog) {
+	 * 
+	 * return ResponseEntity.ok( transportService.updateFuelLog(id, fuelLog)); }
+	 */
 
   // DELETE (ADMIN ONLY)
   @PreAuthorize("hasAuthority('FUEL_DELETE')")
