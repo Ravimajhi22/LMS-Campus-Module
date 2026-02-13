@@ -1,6 +1,5 @@
 package com.campusFacilities.www.service.Imp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +9,16 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.campusFacilities.www.Transport.dto.VehicleGpsDTO;
 import com.campusFacilities.www.model.Transport.ConductorDetails;
 import com.campusFacilities.www.model.Transport.DriverDetails;
 import com.campusFacilities.www.model.Transport.FuelLog;
 import com.campusFacilities.www.model.Transport.RouteWay;
 import com.campusFacilities.www.model.Transport.StudentTransportAssignment;
 import com.campusFacilities.www.model.Transport.TransportAttendance;
+import com.campusFacilities.www.model.Transport.TransportFeeStructure;
+import com.campusFacilities.www.model.Transport.TransportPayments;
+import com.campusFacilities.www.model.Transport.TransportSetting;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
 import com.campusFacilities.www.model.Transport.VehicleMaintenance;
@@ -25,6 +28,9 @@ import com.campusFacilities.www.repository.Transport.FuelLogRepository;
 import com.campusFacilities.www.repository.Transport.RouteWayRepository;
 import com.campusFacilities.www.repository.Transport.StudentTransportAssignmentRepository;
 import com.campusFacilities.www.repository.Transport.TransportAttendanceRepository;
+import com.campusFacilities.www.repository.Transport.TransportFeeStructureRepository;
+import com.campusFacilities.www.repository.Transport.TransportPaymentRepository;
+import com.campusFacilities.www.repository.Transport.TransportSettingRepository;
 import com.campusFacilities.www.repository.Transport.VehicleGPSRepository;
 import com.campusFacilities.www.repository.Transport.VehicleMaintenanceRepository;
 import com.campusFacilities.www.repository.Transport.VehicleRepository;
@@ -60,11 +66,24 @@ public class TransportService {
     @Autowired
     private VehicleMaintenanceRepository maintenanceRepository;
     
+    //@Autowired
+    //private KafkaTemplate<String, VehicleGPS> kafkaTemplate;
+    
     @Autowired
-    private KafkaTemplate<String, VehicleGPS> kafkaTemplate;
+    private KafkaTemplate<String, VehicleGpsDTO> kafkaTemplate;
+
     
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    
+    @Autowired
+    private TransportFeeStructureRepository feeRepository;
+
+    @Autowired
+    private TransportPaymentRepository paymentRepository;
+
+    @Autowired
+    private TransportSettingRepository settingRepository;
     
     /* ================= VEHICLE ===================== */
 
@@ -398,108 +417,134 @@ public class TransportService {
 
 
     /* =======================================================
-                   SEND GPS DATA TO KAFKA
-    ======================================================= */
+    									SEND GPS DATA TO KAFKA (Laptop/Mobile Testing)
+														======================================================= */
 
-    public void sendGpsToKafka(Long vehicleId,
-                               double latitude,
-                               double longitude,
-                               double speed) {
+        public void sendGpsToKafka(Long vehicleId,
+            double latitude,
+            double longitude,
+            double speed) {
 
-        Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle Not Found"));
+                 Long defaultVehicleId = 1L;
 
-        VehicleGPS gps = new VehicleGPS();
-        gps.setVehicle(vehicle);
-        gps.setLatitude(latitude);
-        gps.setLongitude(longitude);
-        gps.setSpeed(speed);
-        gps.setStatus(determineStatus(speed));
+                 VehicleGpsDTO dto = new VehicleGpsDTO(
+                		 null,                 
+                		 latitude,
+                		 longitude,
+                		 speed,
+                		 null,                 
+                		 null,                
+                		 defaultVehicleId
+                		 );
+                 
+                 kafkaTemplate.send("vehicle-gps-topic", dto);
 
-        kafkaTemplate.send("vehicle-gps-topic", gps);
-    }
-
-
-    /* =======================================================
-        KAFKA CONSUMER (SAVE + WEBSOCKET PUSH)
-    ======================================================= */
-
-    @KafkaListener(topics = "vehicle-gps-topic", groupId = "gps-group")
-    public void consumeGpsData(VehicleGPS gps) {
-
-        // Geo-fence check
-        if (isOutsideCampus(gps.getLatitude(), gps.getLongitude())) {
-            gps.setStatus(VehicleGPS.VehicleGPSStatus.OFFLINE);
-        }
-        VehicleGPS saved = gpsRepository.save(gps);
-
-        // Push to WebSocket subscribers
-        messagingTemplate.convertAndSend(
-                "/topic/vehicle/" + saved.getVehicle().getId(),
-                saved
-        );
-    }
+                 System.out.println(" GPS DTO Sent to Kafka Successfully");
+        			}
 
 
-    /* ================= GET LATEST LOCATION ================= */
 
-    public VehicleGPS getLatestLocation(Long vehicleId) {
+        	/* =======================================================
+        						KAFKA CONSUMER (SAVE + WEBSOCKET PUSH)
+    		======================================================= */
+        		
+        			@KafkaListener(topics = "vehicle-gps-topic", groupId = "gps-group")
+        			public void consumeGpsData(VehicleGpsDTO dto) {
 
-        return gpsRepository
-                .findTopByVehicle_IdOrderByTimestampDesc(vehicleId)
-                .orElseThrow(() -> new RuntimeException("No GPS Data Found"));
-    }
+        				System.out.println("Kafka Consumer Triggered");
+
+        				Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
+        						.orElseThrow(() -> new RuntimeException("Vehicle Not Found"));
+
+        				VehicleGPS gps = new VehicleGPS();
+        				gps.setVehicle(vehicle);
+        				gps.setLatitude(dto.getLatitude());
+        				gps.setLongitude(dto.getLongitude());
+        				gps.setSpeed(dto.getSpeed());
+        				gps.setStatus(determineStatus(dto.getSpeed()));
+
+        				if (isOutsideCampus(dto.getLatitude(), dto.getLongitude())) {
+        					gps.setStatus(VehicleGPS.VehicleGPSStatus.OFFLINE);
+        				}
+
+        				VehicleGPS saved = gpsRepository.save(gps);
+
+        				// ✅ Convert Entity → DTO BEFORE sending
+        				VehicleGpsDTO responseDto = new VehicleGpsDTO(
+        						saved.getId(),
+        						saved.getLatitude(),
+        						saved.getLongitude(),
+        						saved.getSpeed(),
+        						saved.getStatus().name(),
+        						saved.getTimestamp(),
+        						saved.getVehicle().getId()
+        						);
+
+        				// ✅ Send DTO (NOT entity)
+        				messagingTemplate.convertAndSend(
+        						"/topic/vehicle/" + saved.getVehicle().getId(),
+        						responseDto
+        						);
+        							}
+
+        			/* ================= GET LATEST LOCATION ================= */
+
+        			public VehicleGPS getLatestLocation(Long vehicleId) {
+
+        				return gpsRepository
+        						.findTopByVehicle_IdOrderByTimestampDesc(vehicleId)
+        						.orElseThrow(() -> new RuntimeException("No GPS Data Found"));
+        						}
 
 
-    /* ================= GET FULL HISTORY ================= */
+        			/* ================= GET FULL HISTORY ================= */
 
-    public List<VehicleGPS> getVehicleHistory(Long vehicleId) {
+        			public List<VehicleGPS> getVehicleHistory(Long vehicleId) {
 
-        return gpsRepository
+        					return gpsRepository
                 .findByVehicle_IdOrderByTimestampDesc(vehicleId);
-    }
+        				}
 
 
-    /* =======================================================
-       AUTO OFFLINE DETECTION (Every 1 Min)
-    ======================================================= */
+        			/* =======================================================
+       													AUTO OFFLINE DETECTION 
+    											======================================================= */
 
-    @Scheduled(fixedRate = 60000)
-    public void checkOfflineVehicles() {
+        				@Scheduled(fixedRate = 60000)
+        				public void checkOfflineVehicles() {
 
-        List<VehicleGPS> allGps = gpsRepository.findAll();
+        					List<VehicleGPS> allGps = gpsRepository.findAll();
 
-        for (VehicleGPS gps : allGps) {
+        					for (VehicleGPS gps : allGps) {
 
-            if (gps.getTimestamp().isBefore(
-                    LocalDateTime.now().minusMinutes(5))) {
+			/*
+			 * // if (gps.getTimestamp().isBefore( //LocalDateTime.now().minusMinutes(5))) {
+			 * 
+			 * //gps.setStatus(VehicleGPS.VehicleGPSStatus.OFFLINE);
+			 * //gpsRepository.save(gps); //}
+			 */        }
+        							}
 
-                gps.setStatus(VehicleGPS.VehicleGPSStatus.OFFLINE);
-                gpsRepository.save(gps);
-            }
-        }
-    }
 
+        				/* =======================================================
+       														PRIVATE METHODS
+    															======================================================= */
 
-    /* =======================================================
-       PRIVATE METHODS
-    ======================================================= */
+        				private boolean isOutsideCampus(double lat, double lng) {
+        					return lat < MIN_LAT || lat > MAX_LAT
+        							|| lng < MIN_LNG || lng > MAX_LNG;
+        								}
 
-    private boolean isOutsideCampus(double lat, double lng) {
-        return lat < MIN_LAT || lat > MAX_LAT
-                || lng < MIN_LNG || lng > MAX_LNG;
-    }
+        				private VehicleGPS.VehicleGPSStatus determineStatus(double speed) {
 
-    private VehicleGPS.VehicleGPSStatus determineStatus(double speed) {
-
-        if (speed == 0) {
-            return VehicleGPS.VehicleGPSStatus.STOPPED;
-        } else if (speed < 5) {
-            return VehicleGPS.VehicleGPSStatus.IDLE;
-        } else {
-            return VehicleGPS.VehicleGPSStatus.ACTIVE;
-        }
-    }
+        					if (speed == 0) {
+        						return VehicleGPS.VehicleGPSStatus.STOPPED;
+        					} else if (speed < 5) {
+        						return VehicleGPS.VehicleGPSStatus.IDLE;
+        					} else {
+        						return VehicleGPS.VehicleGPSStatus.ACTIVE;
+        					}
+        					}
 
    
     
@@ -871,7 +916,80 @@ public class TransportService {
 	public void deleteMaintenance(Long id) {
 	    maintenanceRepository.delete(getMaintenanceById(id));
 	}
+//=========================FEE STRUCTURE ====================//
+	
 
+    public TransportFeeStructure save(TransportFeeStructure structure) {
+        return feeRepository.save(structure);
+    }
 
+    public List<TransportFeeStructure> getAll() {
+        return feeRepository.findAll();
+    }
 
+    public TransportFeeStructure getMyRouteFee() {
+
+        Long routeId = getLoggedInStudentRouteId();
+
+        return feeRepository.findByRouteId(routeId)
+                .orElseThrow(() -> new RuntimeException("Fee structure not found"));
+    }
+
+    public TransportFeeStructure update(Long id, TransportFeeStructure updated) {
+
+        TransportFeeStructure existing = feeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Fee structure not found"));
+
+        existing.setAnnualFee(updated.getAnnualFee());
+        existing.setAcademicYear(updated.getAcademicYear());
+        existing.setRouteId(updated.getRouteId());
+
+        return feeRepository.save(existing);
+    }
+
+    public void delete(Long id) {
+        feeRepository.deleteById(id);
+    }
+
+//=============Payments=======================//
+    public TransportPayments save(TransportPayments payment) {
+        return paymentRepository.save(payment);
+    }
+
+    public List<TransportPayments> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    public List<TransportPayments> getMyPayments() {
+
+        Long studentId = getLoggedInStudentId();
+
+        return paymentRepository.findByStudentId(studentId);
+    }
+
+    public List<TransportPayments> getByStudent(Long studentId) {
+        return paymentRepository.findByStudentId(studentId);
+    }
+
+    public void delete(String paymentId) {
+        paymentRepository.deleteById(paymentId);
+    }
+ // ============================================Settings============//
+   
+    public TransportSetting save(TransportSetting setting) {
+        return settingRepository.save(setting);
+    }
+
+    public List<TransportSetting> getAllSettings() {
+        return settingRepository.findAll();
+    }
+
+    private Long getLoggedInStudentId() {
+        return 1L; // TODO: Replace with SecurityContext
+    }
+
+    private Long getLoggedInStudentRouteId() {
+        return 1L; // TODO: Replace with actual route lookup
+    }
 }
+

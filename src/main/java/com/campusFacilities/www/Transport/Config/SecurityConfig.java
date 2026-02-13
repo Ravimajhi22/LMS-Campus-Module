@@ -35,10 +35,15 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/", "/error").permitAll()
-                .requestMatchers(request -> "OPTIONS".equals(request.getMethod())).permitAll()
-                .anyRequest().authenticated()
+                    .requestMatchers("/auth/**", "/", "/error").permitAll()
+                    .requestMatchers("/gps-websocket/**").permitAll()
+                    // 🔥 Allow GPS POST for mobile/laptop testing
+                    .requestMatchers("/gps/**").permitAll()
+                    .requestMatchers(request -> "OPTIONS".equals(request.getMethod())).permitAll()
+
+                    .anyRequest().authenticated()
             )
+
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -52,7 +57,7 @@ public class SecurityConfig {
             "http://localhost:5174", 
             "http://localhost:5175",
             "http://192.168.1.31:5173",
-            "http:// 192.168.1.12:5173"
+            "http://192.168.1.12:5173"
             
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

@@ -21,6 +21,9 @@ import com.campusFacilities.www.model.Transport.FuelLog;
 import com.campusFacilities.www.model.Transport.RouteWay;
 import com.campusFacilities.www.model.Transport.StudentTransportAssignment;
 import com.campusFacilities.www.model.Transport.TransportAttendance;
+import com.campusFacilities.www.model.Transport.TransportFeeStructure;
+import com.campusFacilities.www.model.Transport.TransportPayments;
+import com.campusFacilities.www.model.Transport.TransportSetting;
 import com.campusFacilities.www.model.Transport.Vehicle;
 import com.campusFacilities.www.model.Transport.VehicleGPS;
 import com.campusFacilities.www.model.Transport.VehicleMaintenance;
@@ -224,13 +227,15 @@ public class TransportController {
     @PreAuthorize("hasAuthority('GPS_ADD')")
     @PostMapping("/gps")
     public ResponseEntity<String> sendGpsData(
-            @RequestParam Long vehicleId,
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double speed) {
 
-    	transportService.sendGpsToKafka(
-                vehicleId,
+       
+        Long defaultVehicleId = 1L;
+
+        transportService.sendGpsToKafka(
+                defaultVehicleId,
                 latitude,
                 longitude,
                 speed
@@ -238,29 +243,28 @@ public class TransportController {
 
         return ResponseEntity.ok("GPS Data Sent to Kafka Successfully");
     }
-    
+
     @PreAuthorize("hasAuthority('GPS_VIEW')")
     @GetMapping("/gps/latest/{vehicleId}")
     public ResponseEntity<VehicleGPS> getLatestLocation(
             @PathVariable Long vehicleId) {
 
         return ResponseEntity.ok(
-        		transportService.getLatestLocation(vehicleId)
+                transportService.getLatestLocation(vehicleId)
         );
     }
 
 
+    @PreAuthorize("hasAuthority('GPS_VIEW')")
+    @GetMapping("/gps/history/{vehicleId}")
+    public ResponseEntity<List<VehicleGPS>> getVehicleHistory(
+            @PathVariable Long vehicleId) {
 
- @PreAuthorize("hasAuthority('GPS_VIEW')")
- @GetMapping("/gps/history/{vehicleId}")
- public ResponseEntity<List<VehicleGPS>> getVehicleHistory(
-         @PathVariable Long vehicleId) {
-
-     return ResponseEntity.ok(
-    		 transportService.getVehicleHistory(vehicleId)
-     );
-  }
-        
+        return ResponseEntity.ok(
+                transportService.getVehicleHistory(vehicleId)
+        );
+    }
+  
         /* =====================================================
                            TRANSPORT ATTENDANCE
          * ===================================================== */
@@ -506,6 +510,111 @@ public ResponseEntity<String> deleteMaintenance(@PathVariable Long id) {
    transportService.deleteMaintenance(id);
    return ResponseEntity.ok("Maintenance record deleted successfully");
 }
+
+//================================Transport Fee Structure=================================//
+
+
+//Create Fee Structure
+@PreAuthorize("hasAuthority('FEE_STRUCTURE_ADD')")
+@PostMapping("/fee-structure")
+public ResponseEntity<TransportFeeStructure> createFeeStructure(
+     @RequestBody TransportFeeStructure structure) {
+
+ return ResponseEntity.ok(transportService.save(structure));
+}
+//View All Fee Structures (Admin)
+@PreAuthorize("hasAuthority('FEE_STRUCTURE_VIEW')")
+@GetMapping("/fee-structure")
+public ResponseEntity<List<TransportFeeStructure>> getAllFeeStructures() {
+
+ return ResponseEntity.ok(transportService.getAll());
+}
+
+//Student View Own Route Fee
+@PreAuthorize("hasAuthority('FEE_STRUCTURE_VIEW_SELF')")
+@GetMapping("/fee-structure/my")
+public ResponseEntity<TransportFeeStructure> getMyRouteFee() {
+
+ return ResponseEntity.ok(transportService.getMyRouteFee());
+}
+//Update Fee Structure
+@PreAuthorize("hasAuthority('FEE_STRUCTURE_UPDATE')")
+@PutMapping("/fee-structure/{id}")
+public ResponseEntity<TransportFeeStructure> updateFeeStructure(
+     @PathVariable Long id,
+     @RequestBody TransportFeeStructure structure) {
+
+ return ResponseEntity.ok(transportService.update(id, structure));
+}
+//Delete Fee Structure
+@PreAuthorize("hasAuthority('FEE_STRUCTURE_DELETE')")
+@DeleteMapping("/fee-structure/{id}")
+public ResponseEntity<String> deleteFeeStructure(@PathVariable Long id) {
+
+	transportService.delete(id);
+ return ResponseEntity.ok("Fee structure deleted successfully");
+}
+//==============================Transport Payments Controller=================//
+
+
+
+//Admin Record Payment
+@PreAuthorize("hasAuthority('PAYMENT_ADD')")
+@PostMapping("/payments")
+public ResponseEntity<TransportPayments> addPayment(
+     @RequestBody TransportPayments payment) {
+
+ return ResponseEntity.ok(transportService.save(payment));
+}
+//Admin View All Payments
+@PreAuthorize("hasAuthority('PAYMENT_VIEW_ALL')")
+@GetMapping("/payments")
+public ResponseEntity<List<TransportFeeStructure>> getAllPayments() {
+
+ return ResponseEntity.ok(transportService.getAll());
+}
+//Student View Own Payments
+@PreAuthorize("hasAuthority('PAYMENT_VIEW_SELF')")
+@GetMapping("/payments/my")
+public ResponseEntity<List<TransportPayments>> getMyPayments() {
+
+ return ResponseEntity.ok(transportService.getMyPayments());
+}
+//Parent View Child Payments
+@PreAuthorize("hasAuthority('PAYMENT_VIEW_CHILD')")
+@GetMapping("/payments/child/{studentId}")
+public ResponseEntity<List<TransportPayments>> getChildPayments(
+     @PathVariable Long studentId) {
+
+ return ResponseEntity.ok(transportService.getByStudent(studentId));
+}
+//Admin Delete Payment
+@PreAuthorize("hasAuthority('PAYMENT_DELETE')")
+@DeleteMapping("/payments/{paymentId}")
+public ResponseEntity<String> deletePayment(@PathVariable String paymentId) {
+
+ transportService.delete(paymentId);
+ return ResponseEntity.ok("Payment deleted successfully");
+}
+
+
+//=========================Transport Settings Controller=================//
+
+
+@PreAuthorize("hasAuthority('TRANSPORT_SETTING_UPDATE')")
+@PostMapping("/settings")
+public ResponseEntity<TransportSetting> saveSetting(
+        @RequestBody TransportSetting setting) {
+
+    return ResponseEntity.ok(transportService.save(setting));
+}
+@PreAuthorize("hasAuthority('TRANSPORT_SETTING_VIEW')")
+@GetMapping("/settings")
+public ResponseEntity<List<TransportFeeStructure>> getAllSettings() {
+
+    return ResponseEntity.ok(transportService.getAll());
+}
+
 }
     
 

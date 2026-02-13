@@ -1,4 +1,6 @@
 package com.campusFacilities.www.model.Transport;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,13 +25,17 @@ public class StudentTransportAssignment {
 
     @Column(nullable = false)
     private Long studentId;
-
+  
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
+    @JsonIgnoreProperties({"route", "hibernateLazyInitializer", "handler"})
     private Vehicle vehicle;
+    
+    
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "route_id")
+    @JsonIgnoreProperties({"vehicles", "hibernateLazyInitializer", "handler"})
     private RouteWay route;
     
     @Column(nullable = false, length = 100)
