@@ -566,13 +566,17 @@ public ResponseEntity<TransportPayments> addPayment(
 
  return ResponseEntity.ok(transportService.save(payment));
 }
+
+
 //Admin View All Payments
 @PreAuthorize("hasAuthority('PAYMENT_VIEW_ALL')")
 @GetMapping("/payments")
-public ResponseEntity<List<TransportFeeStructure>> getAllPayments() {
+public ResponseEntity<List<TransportPayments>> getAllPayments() {
 
- return ResponseEntity.ok(transportService.getAll());
+ return ResponseEntity.ok(transportService.getAllPayments());
 }
+
+
 //Student View Own Payments
 @PreAuthorize("hasAuthority('PAYMENT_VIEW_SELF')")
 @GetMapping("/payments/my")
@@ -580,6 +584,8 @@ public ResponseEntity<List<TransportPayments>> getMyPayments() {
 
  return ResponseEntity.ok(transportService.getMyPayments());
 }
+
+
 //Parent View Child Payments
 @PreAuthorize("hasAuthority('PAYMENT_VIEW_CHILD')")
 @GetMapping("/payments/child/{studentId}")
@@ -588,18 +594,17 @@ public ResponseEntity<List<TransportPayments>> getChildPayments(
 
  return ResponseEntity.ok(transportService.getByStudent(studentId));
 }
+
+
 //Admin Delete Payment
 @PreAuthorize("hasAuthority('PAYMENT_DELETE')")
 @DeleteMapping("/payments/{paymentId}")
-public ResponseEntity<String> deletePayment(@PathVariable String paymentId) {
-
+public ResponseEntity<String> deletePayment(@PathVariable Long paymentId) {
  transportService.delete(paymentId);
  return ResponseEntity.ok("Payment deleted successfully");
 }
 
-
 //=========================Transport Settings Controller=================//
-
 
 @PreAuthorize("hasAuthority('TRANSPORT_SETTING_UPDATE')")
 @PostMapping("/settings")
@@ -608,14 +613,13 @@ public ResponseEntity<TransportSetting> saveSetting(
 
     return ResponseEntity.ok(transportService.save(setting));
 }
+
 @PreAuthorize("hasAuthority('TRANSPORT_SETTING_VIEW')")
 @GetMapping("/settings")
-public ResponseEntity<List<TransportFeeStructure>> getAllSettings() {
+public ResponseEntity<List<TransportSetting>> getAllSettings() {
 
-    return ResponseEntity.ok(transportService.getAll());
+    return ResponseEntity.ok(transportService.getAllSettings());
 }
-
 }
-    
 
 

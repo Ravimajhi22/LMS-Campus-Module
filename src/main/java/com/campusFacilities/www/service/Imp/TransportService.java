@@ -1,6 +1,8 @@
 package com.campusFacilities.www.service.Imp;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -416,9 +418,9 @@ public class TransportService {
     private static final double MAX_LNG = 78.5000;
 
 
-    /* =======================================================
-    									SEND GPS DATA TO KAFKA (Laptop/Mobile Testing)
-														======================================================= */
+            /* =======================================================
+    			SEND GPS DATA TO KAFKA (Laptop/Mobile Testing)
+	             ======================================================= */
 
         public void sendGpsToKafka(Long vehicleId,
             double latitude,
@@ -450,26 +452,20 @@ public class TransportService {
         		
         			@KafkaListener(topics = "vehicle-gps-topic", groupId = "gps-group")
         			public void consumeGpsData(VehicleGpsDTO dto) {
-
         				System.out.println("Kafka Consumer Triggered");
-
         				Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
         						.orElseThrow(() -> new RuntimeException("Vehicle Not Found"));
-
         				VehicleGPS gps = new VehicleGPS();
         				gps.setVehicle(vehicle);
         				gps.setLatitude(dto.getLatitude());
         				gps.setLongitude(dto.getLongitude());
         				gps.setSpeed(dto.getSpeed());
         				gps.setStatus(determineStatus(dto.getSpeed()));
-
         				if (isOutsideCampus(dto.getLatitude(), dto.getLongitude())) {
         					gps.setStatus(VehicleGPS.VehicleGPSStatus.OFFLINE);
         				}
-
         				VehicleGPS saved = gpsRepository.save(gps);
-
-        				// ✅ Convert Entity → DTO BEFORE sending
+        				// Convert Entity → DTO BEFORE sending
         				VehicleGpsDTO responseDto = new VehicleGpsDTO(
         						saved.getId(),
         						saved.getLatitude(),
@@ -479,14 +475,12 @@ public class TransportService {
         						saved.getTimestamp(),
         						saved.getVehicle().getId()
         						);
-
-        				// ✅ Send DTO (NOT entity)
+        				//Send DTO (NOT entity)
         				messagingTemplate.convertAndSend(
         						"/topic/vehicle/" + saved.getVehicle().getId(),
         						responseDto
         						);
         							}
-
         			/* ================= GET LATEST LOCATION ================= */
 
         			public VehicleGPS getLatestLocation(Long vehicleId) {
@@ -495,21 +489,15 @@ public class TransportService {
         						.findTopByVehicle_IdOrderByTimestampDesc(vehicleId)
         						.orElseThrow(() -> new RuntimeException("No GPS Data Found"));
         						}
-
-
         			/* ================= GET FULL HISTORY ================= */
 
         			public List<VehicleGPS> getVehicleHistory(Long vehicleId) {
-
         					return gpsRepository
                 .findByVehicle_IdOrderByTimestampDesc(vehicleId);
         				}
-
-
         			/* =======================================================
-       													AUTO OFFLINE DETECTION 
-    											======================================================= */
-
+       	                        	AUTO OFFLINE DETECTION 
+    				======================================================= */
         				@Scheduled(fixedRate = 60000)
         				public void checkOfflineVehicles() {
 
@@ -526,9 +514,9 @@ public class TransportService {
         							}
 
 
-        				/* =======================================================
-       														PRIVATE METHODS
-    															======================================================= */
+     /* =======================================================
+       	                 PRIVATE METHODS
+    	======================================================= */
 
         				private boolean isOutsideCampus(double lat, double lng) {
         					return lat < MIN_LAT || lat > MAX_LAT
@@ -838,8 +826,7 @@ public class TransportService {
 	public void deleteFuelLog(Long id) {
 	    fuelLogRepository.delete(getFuelLogById(id));
 	}
-
-
+	
 	/* ========================== VEHICLE MAINTENANCE ========================== */
 
 	public VehicleMaintenance addMaintenance(VehicleMaintenance maintenance) {
@@ -874,7 +861,6 @@ public class TransportService {
 	        VehicleMaintenance maintenance) {
 
 	    VehicleMaintenance existing = getMaintenanceById(id);
-
 	    existing.setVehicleId(maintenance.getVehicleId());
 	    existing.setType(maintenance.getType());
 	    existing.setDate(maintenance.getDate());
@@ -888,8 +874,8 @@ public class TransportService {
 
 	public VehicleMaintenance patchMaintenance(
 	        Long id,
-	        VehicleMaintenance maintenance) {
-
+	        VehicleMaintenance maintenance) 
+	{
 	    VehicleMaintenance existing = getMaintenanceById(id);
 
 	    if (maintenance.getType() != null)
@@ -912,11 +898,12 @@ public class TransportService {
 
 	    return maintenanceRepository.save(existing);
 	}
-
 	public void deleteMaintenance(Long id) {
 	    maintenanceRepository.delete(getMaintenanceById(id));
 	}
-//=========================FEE STRUCTURE ====================//
+	
+	
+       //=========================FEE STRUCTURE ====================//
 	
 
     public TransportFeeStructure save(TransportFeeStructure structure) {
@@ -951,8 +938,24 @@ public class TransportService {
         feeRepository.deleteById(id);
     }
 
-//=============Payments=======================//
+       //=============Payments=======================//
+    
     public TransportPayments save(TransportPayments payment) {
+
+        if (payment.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+
+            Optional<TransportSetting> setting =
+                    settingRepository.findByKeyName("refundAllowed");
+
+            if (setting.isPresent() && 
+                "false".equalsIgnoreCase(setting.get().getValue())) {
+
+                throw new RuntimeException("Refunds are not allowed");
+            }
+        }
+
+        payment.setId("txn_" + System.currentTimeMillis());
+
         return paymentRepository.save(payment);
     }
 
@@ -974,22 +977,30 @@ public class TransportService {
     public void delete(String paymentId) {
         paymentRepository.deleteById(paymentId);
     }
- // ============================================Settings============//
-   
-    public TransportSetting save(TransportSetting setting) {
-        return settingRepository.save(setting);
+ // ============================================ Payment Settings =========================================//
+
+    public TransportSetting save(TransportSetting request) {
+
+        Optional<TransportSetting> existing =
+                settingRepository.findByKeyName(request.getKeyName());
+
+        if (existing.isPresent()) {
+            TransportSetting setting = existing.get();
+            setting.setValue(request.getValue());
+            return settingRepository.save(setting);
+        }
+
+        return settingRepository.save(request);
     }
 
     public List<TransportSetting> getAllSettings() {
         return settingRepository.findAll();
     }
-
     private Long getLoggedInStudentId() {
-        return 1L; // TODO: Replace with SecurityContext
+        return 1L; 
     }
-
     private Long getLoggedInStudentRouteId() {
-        return 1L; // TODO: Replace with actual route lookup
+        return 1L; 
     }
 }
 
