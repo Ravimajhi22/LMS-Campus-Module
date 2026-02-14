@@ -15,8 +15,9 @@ import lombok.Data;
 @Entity
 @Table(name = "marketing_content")
 @Data
-public class MarketingContent {
-
+public class MarketingContent
+{
+	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
@@ -27,11 +28,9 @@ public class MarketingContent {
 
     @Column(name = "content_type", length = 50, nullable = false)
     private String contentType; 
-    // Post, Video, Banner, Email
 
     @Column(name = "platform", length = 50, nullable = false)
     private String platform; 
-    // Instagram, Facebook, Email
 
     @Column(name = "content_url", length = 255)
     private String contentUrl;

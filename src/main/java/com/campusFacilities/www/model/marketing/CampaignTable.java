@@ -1,46 +1,67 @@
-package com.campusFacilities.www.model.marketing;
 
-import java.time.LocalDate;
-
-import jakarta.persistence.Column;
+ package com.campusFacilities.www.model.marketing; import
+  jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import
+  jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import
+  jakarta.persistence.GeneratedValue;
+import
+  jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import
+  jakarta.persistence.Table;
 import lombok.Data;
 
-@Entity
-@Table(name = "marketing_campaign")
-@Data
-public class CampaignTable 
-{
+  @Entity
+  @Table(name = "marketing_campaign") 
+  @Data 
+  public class CampaignTable {
+  
 	    @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "campaign_id")
-	    private Integer campaignId;
+	    private Long id;
 
-	    @Column(name = "campaign_name", length = 150, nullable = false)
+	    @Column(nullable = false)
 	    private String campaignName;
 
-	    @Column(name = "campaign_type", length = 50, nullable = false)
-	    private String campaignType; 
+	 
+	    @Enumerated(EnumType.STRING)
+	    @Column(nullable = false)
+	    private ChannelType channel;
+	    public enum ChannelType {
+	        EMAIL,
+	        WHATSAPP,
+	        PUSH_NOTIFICATION,
+	        SMS,
+	        TELEGRAM,
+	        IN_APP
+	    }
+	    
+	    @Enumerated(EnumType.STRING)
+	    @Column(nullable = false)
+	    private CampaignType type;
+	    public enum CampaignType {
+	        BROADCAST,
+	        TRIGGER_BASED
+	    }
 
-	    @Column(name = "start_date", nullable = false)
-	    private LocalDate startDate;
+	    @Column(nullable = false)
+	    private String companyName;
 
-	    @Column(name = "end_date", nullable = false)
-	    private LocalDate endDate;
+	    @Column(nullable = false)
+	    private String address;
 
-	    @Column(name = "budget")
-	    private Double budget;
+	    @Column(nullable = false)
+	    private String city;
 
-	    @Column(name = "status", length = 30)
-	    private String status; 
+	    @Column(nullable = false)
+	    private String state;
 
-	    @Column(name = "description", length = 500)
-	    private String description;
+	    @Column(nullable = false)
+	    private String zipCode;
 
-	
-		}
-
+	    @Column(nullable = false)
+	    private String country;
+	}
