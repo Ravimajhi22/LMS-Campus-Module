@@ -29,7 +29,7 @@ const LibraryManagement = () => {
             animate={{ y: 0, opacity: 1 }}
             className="flex items-center gap-4 mb-6"
           >
-            <div className="h-12 w-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 shadow-2xl">
+            <div className="h-12 w-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 border border-primary-500/20 shadow-2xl">
                <Archive size={24} />
             </div>
             <h1 className="text-4xl font-black text-white tracking-tighter uppercase tracking-[-0.04em]">Library Management</h1>
@@ -43,7 +43,7 @@ const LibraryManagement = () => {
             <Plus size={18} strokeWidth={3} />
             Add Book
           </button>
-          <button className="flex items-center gap-4 bg-white text-slate-950 px-10 py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-50 active:scale-95 transition-all shadow-2xl">
+          <button className="flex items-center gap-4 bg-white text-slate-950 px-10 py-5 rounded-[1.5rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-primary-50 active:scale-95 transition-all shadow-2xl">
             <Zap size={20} fill="currentColor" />
             Issue Portal
           </button>
@@ -52,8 +52,8 @@ const LibraryManagement = () => {
 
       {/* Global Filter Bar */}
       <div className="glass-ultra p-3 flex flex-col md:flex-row items-center gap-4 rounded-[2rem] border border-white/[0.03] shadow-2xl">
-        <div className="flex-1 flex items-center bg-slate-950/40 border border-white/[0.04] rounded-2xl px-6 py-4 text-slate-400 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all group">
-          <Search size={20} className="group-focus-within:text-indigo-400 transition-colors" />
+        <div className="flex-1 flex items-center bg-slate-950/40 border border-white/[0.04] rounded-2xl px-6 py-4 text-slate-400 focus-within:ring-2 focus-within:ring-primary-500/20 transition-all group">
+          <Search size={20} className="group-focus-within:text-primary-400 transition-colors" />
           <input 
             type="text" 
             placeholder="Search resources by Title_ID, Author_Base, or Global Protocol..." 
@@ -70,7 +70,7 @@ const LibraryManagement = () => {
           </button>
           <div className="h-10 w-[1px] bg-white/[0.04] mx-2"></div>
           <div className="flex bg-slate-950/60 border border-white/[0.04] rounded-2xl p-2 gap-2 shadow-inner">
-            <button className="p-2.5 bg-indigo-500 text-white rounded-xl shadow-2xl transition-all"><LayoutGrid size={22} /></button>
+            <button className="p-2.5 bg-primary-500 text-white rounded-xl shadow-2xl transition-all"><LayoutGrid size={22} /></button>
             <button className="p-2.5 text-slate-700 hover:text-slate-300 transition-all"><List size={22} /></button>
           </div>
         </div>
@@ -86,8 +86,8 @@ const LibraryManagement = () => {
              </div>
              
              <div className="p-10">
-               <div className={`h-16 w-16 rounded-[1.5rem] bg-slate-950 flex items-center justify-center mb-10 transition-all duration-700 group-hover:scale-125 group-hover:rotate-12 border border-white/[0.02] shadow-2xl ${
-                  book.available > 0 ? 'text-indigo-400' : 'text-rose-500'
+                <div className={`h-16 w-16 rounded-[1.5rem] bg-slate-950 flex items-center justify-center mb-10 transition-all duration-700 group-hover:scale-125 group-hover:rotate-12 border border-white/[0.02] shadow-2xl ${
+                  book.available > 0 ? 'text-primary-400' : 'text-rose-500'
                }`}>
                   <BookOpen size={32} strokeWidth={1} />
                </div>
@@ -115,7 +115,7 @@ const LibraryManagement = () => {
                   </div>
                   <div className="h-2 w-full bg-slate-950/60 rounded-full border border-white/[0.02] overflow-hidden p-[3px]">
                      <div 
-                        className={`h-full rounded-full transition-all duration-1000 shadow-lg ${book.available > 0 ? 'bg-gradient-to-r from-indigo-500 to-sky-400 shadow-indigo-500/20' : 'bg-rose-500 shadow-rose-500/20'}`} 
+                        className={`h-full rounded-full transition-all duration-1000 shadow-lg ${book.available > 0 ? 'bg-gradient-to-r from-primary-500 to-sky-400 shadow-primary-500/20' : 'bg-rose-500 shadow-rose-500/20'}`} 
                         style={{ width: `${(book.available / book.total) * 100}%` }}
                       />
                   </div>
@@ -123,14 +123,14 @@ const LibraryManagement = () => {
 
                <div className="pt-8 border-t border-white/[0.03] flex justify-between items-center relative overflow-hidden">
                   <div className="flex items-center gap-3">
-                     <div className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">{book.category}</span>
+                      <div className="px-3 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-xl">
+                        <span className="text-[9px] font-black text-primary-400 uppercase tracking-widest">{book.category}</span>
                      </div>
                   </div>
                   
                   <button className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     book.available > 0 
-                    ? 'bg-white/5 text-indigo-400 hover:bg-white/10 hover:text-white border border-white/5' 
+                    ? 'bg-white/5 text-primary-400 hover:bg-white/10 hover:text-white border border-white/5' 
                     : 'text-slate-800 pointer-events-none opacity-40'
                   }`}>
                     {book.available > 0 ? <Zap size={14} fill="currentColor" /> : <ShieldAlert size={14} />}
@@ -149,7 +149,7 @@ const LibraryManagement = () => {
       <motion.div variants={itemVariants} className="glass-ultra rounded-[2.5rem] border border-white/[0.02] overflow-hidden divide-y divide-white/[0.04] shadow-2xl">
          <div className="p-10 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-6">
-               <div className="h-16 w-16 bg-slate-950 border border-white/[0.04] rounded-2xl flex items-center justify-center text-indigo-400">
+                <div className="h-16 w-16 bg-slate-950 border border-white/[0.04] rounded-2xl flex items-center justify-center text-primary-400">
                   <Download size={24} strokeWidth={1.5} />
                </div>
                <div>
@@ -157,7 +157,7 @@ const LibraryManagement = () => {
                   <p className="text-slate-600 text-xs font-black uppercase tracking-widest mt-1">Export Global Resource Metadata [2.4MB]</p>
                </div>
             </div>
-            <button className="px-10 py-4 bg-indigo-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-indigo-400 shadow-2xl transition-all">Download Archives</button>
+            <button className="px-10 py-4 bg-primary-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-primary-400 shadow-2xl transition-all">Download Archives</button>
          </div>
       </motion.div>
     </motion.div>

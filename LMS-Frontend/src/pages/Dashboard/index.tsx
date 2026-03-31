@@ -20,10 +20,10 @@ const Sparkline = ({ color }: { color: string }) => (
 
 const Dashboard = () => {
   const stats = [
-    { label: 'Network Students', value: '1,284', icon: <Users size={22} />, color: '#6366f1', trend: '+12%', subtext: 'System Peak Load' },
+    { label: 'Network Students', value: '1,284', icon: <Users size={22} />, color: '#3b82f6', trend: '+12%', subtext: 'System Peak Load' },
     { label: 'Unit Occupancy', value: '86%', icon: <Building size={22} />, color: '#10b981', trend: '+5%', subtext: 'Sector 4 Active' },
-    { label: 'Active Logistics', value: '24', icon: <Bus size={22} />, color: '#0ea5e9', trend: 'STABLE', subtext: 'Route Optimised' },
-    { label: 'Data Archives', value: '412', icon: <BookOpen size={22} />, color: '#8b5cf6', trend: '+18%', subtext: 'Node Sync 100%' },
+    { label: 'Active Logistics', value: '24', icon: <Bus size={22} />, color: '#60a5fa', trend: 'STABLE', subtext: 'Route Optimised' },
+    { label: 'Data Archives', value: '412', icon: <BookOpen size={22} />, color: '#6366f1', trend: '+18%', subtext: 'Node Sync 100%' },
   ]
 
   const containerVariants = {
@@ -45,18 +45,18 @@ const Dashboard = () => {
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-12 pb-24">
       {/* High-Impact Hero Section */}
       <div className="relative group overflow-hidden glass-ultra rounded-[2.5rem] p-10 lg:p-14 border border-white/[0.03]">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-sky-500/5 to-transparent z-0"></div>
-        <div className="absolute -right-24 -top-24 h-96 w-96 bg-indigo-500/10 blur-[120px] rounded-full group-hover:bg-indigo-500/20 transition-all duration-1000"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-sky-500/5 to-transparent z-0"></div>
+        <div className="absolute -right-24 -top-24 h-96 w-96 bg-primary-500/10 blur-[120px] rounded-full group-hover:bg-primary-500/20 transition-all duration-1000"></div>
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-14">
           <div className="max-w-3xl">
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="inline-flex items-center space-x-3 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl mb-8"
+              className="inline-flex items-center space-x-3 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-2xl mb-8"
             >
-               <Sparkles size={14} className="text-indigo-400" />
-               <span className="text-[10px] font-black tracking-[0.2em] uppercase text-indigo-400/90">System Overview</span>
+               <Sparkles size={14} className="text-primary-400" />
+               <span className="text-[10px] font-black tracking-[0.2em] uppercase text-primary-400/90">System Overview</span>
             </motion.div>
             
             <h1 className="text-5xl lg:text-7xl font-extrabold text-white tracking-tighter mb-6 leading-[0.9]">
@@ -70,13 +70,13 @@ const Dashboard = () => {
             </p>
             
             <div className="flex flex-wrap gap-5">
-              <button className="group flex items-center space-x-3 bg-white text-slate-950 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-indigo-50 shadow-white/5 transition-all active:scale-95">
+              <button className="group flex items-center space-x-3 bg-white text-slate-950 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-primary-50 shadow-white/5 transition-all active:scale-95">
                 <Zap size={18} fill="currentColor" />
                 <span>Primary Console</span>
                 <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </button>
               <button className="flex items-center space-x-3 bg-slate-950/40 border border-white/5 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/[0.04] hover:border-white/10 transition-all">
-                <HardDrive size={18} className="text-indigo-400" />
+                <HardDrive size={18} className="text-primary-400" />
                 <span>Diagnostics</span>
               </button>
             </div>
@@ -85,7 +85,7 @@ const Dashboard = () => {
           <div className="hidden xl:flex flex-col gap-5">
              <div className="grid grid-cols-2 gap-5">
                {[
-                 { label: 'CPU Load', value: '14%', icon: <Cpu />, color: 'text-indigo-400' },
+                 { label: 'CPU Load', value: '14%', icon: <Cpu />, color: 'text-primary-400' },
                  { label: 'Threats', value: '0', icon: <Shield />, color: 'text-emerald-400' },
                  { label: 'Uptime', value: '47d', icon: <Activity />, color: 'text-sky-400' },
                  { label: 'Nodes', value: '812', icon: <Globe />, color: 'text-purple-400' },
@@ -147,14 +147,14 @@ const Dashboard = () => {
           <div className="p-10 pb-6 flex items-center justify-between border-b border-white/[0.02]">
             <div>
               <h2 className="text-2xl font-black flex items-center gap-4 text-white uppercase tracking-tighter">
-                <BarChart3 size={24} className="text-indigo-400" />
+                <BarChart3 size={24} className="text-primary-400" />
                 Recent Activities
               </h2>
               <p className="text-slate-600 text-xs font-bold mt-1 uppercase tracking-widest">[Live Update]</p>
             </div>
             <div className="flex space-x-2">
                <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-950 border border-white/5 text-slate-500 hover:text-white transition-all"><LayoutGrid size={18} /></button>
-               <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-indigo-400 transition-all shadow-inner"><List size={18} /></button>
+               <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-primary-400 transition-all shadow-inner"><List size={18} /></button>
             </div>
           </div>
           
@@ -202,7 +202,7 @@ const Dashboard = () => {
           </div>
           <div className="p-10 bg-slate-950/40 flex items-center justify-between">
              <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Displaying 5 of 128 archived nodes</span>
-             <button className="flex items-center gap-2 text-[10px] font-black text-indigo-400 hover:text-white transition-all uppercase tracking-[0.2em] group/btn">
+             <button className="flex items-center gap-2 text-[10px] font-black text-primary-400 hover:text-white transition-all uppercase tracking-[0.2em] group/btn">
                Access Full Repository
                <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
              </button>
@@ -231,14 +231,14 @@ const Dashboard = () => {
                   <div className={`h-12 w-12 rounded-2xl flex items-center justify-center border transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_20px] ${
                     alert.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:shadow-emerald-500/30' : 
                     alert.type === 'warning' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400 group-hover:shadow-amber-500/30' : 
-                    'bg-indigo-500/10 border-indigo-500/20 text-indigo-400 group-hover:shadow-indigo-500/30'
+                    'bg-primary-500/10 border-primary-500/20 text-primary-400 group-hover:shadow-primary-500/30'
                   }`}>
                     {alert.type === 'success' ? <TrendingUp size={18} /> : alert.type === 'warning' ? <Zap size={18} /> : <Cpu size={18} />}
                   </div>
                   {idx !== 4 && <div className="w-[1px] flex-1 bg-white/[0.03] my-3 border-r border-dashed border-white/[0.04]"></div>}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-[13px] font-black text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{alert.title}</h4>
+                  <h4 className="text-[13px] font-black text-white group-hover:text-primary-400 transition-colors uppercase tracking-tight">{alert.title}</h4>
                   <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-tight font-medium uppercase text-[10px]">{alert.desc}</p>
                   <div className="flex items-center space-x-2 mt-2">
                      <span className="text-[9px] text-slate-800 font-black tracking-widest bg-white/[0.02] px-2 py-0.5 rounded border border-white/[0.04]">{alert.time}</span>

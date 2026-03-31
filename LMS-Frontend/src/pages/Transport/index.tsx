@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 
 const TransportManagement = () => {
   const routes = [
-    { id: 'R01', name: 'Downtown_Express', stops: 12, vehicle: 'Bus_102', status: 'ACTIVE', color: 'from-indigo-500 to-sky-400', load: '88%' },
+    { id: 'R01', name: 'Downtown_Express', stops: 12, vehicle: 'Bus_102', status: 'ACTIVE', color: 'from-primary-500 to-sky-400', load: '88%' },
     { id: 'R04', name: 'North_Campus_Sync', stops: 6, vehicle: 'Bus_304', status: 'DELAYED', color: 'from-rose-500 to-amber-400', load: '42%' },
     { id: 'R07', name: 'West_Gate_Orbital', stops: 8, vehicle: 'Bus_082', status: 'ACTIVE', color: 'from-emerald-500 to-teal-400', load: '95%' },
     { id: 'R12', name: 'Terminal_Shuttle', stops: 4, vehicle: 'Bus_112', status: 'STABLE', color: 'from-slate-500 to-slate-400', load: '12%' },
@@ -29,7 +29,7 @@ const TransportManagement = () => {
             animate={{ scale: 1, opacity: 1 }}
             className="flex items-center gap-4 mb-6"
           >
-            <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-2xl">
+            <div className="h-12 w-12 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 border border-primary-500/20 shadow-2xl">
                <Bus size={24} />
             </div>
             <h1 className="text-4xl font-black text-white tracking-tighter uppercase tracking-[-0.04em]">Transport Management</h1>
@@ -38,7 +38,7 @@ const TransportManagement = () => {
             Manage fleet routes, vehicle tracking and transportation schedules.
           </p>
         </div>
-        <button className="flex items-center gap-4 bg-white text-slate-950 px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-sky-50 active:scale-95 transition-all shadow-2xl">
+        <button className="flex items-center gap-4 bg-white text-slate-950 px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-primary-50 active:scale-95 transition-all shadow-2xl">
           <Plus size={20} strokeWidth={3} />
           Add Route
         </button>
@@ -95,7 +95,7 @@ const TransportManagement = () => {
                   {route.status}
                 </div>
                 
-                <button className="text-[10px] font-black text-indigo-400 hover:text-white uppercase tracking-widest transition-all flex items-center gap-2 group/btn">
+                <button className="text-[10px] font-black text-primary-400 hover:text-white uppercase tracking-widest transition-all flex items-center gap-2 group/btn">
                   ORBITAL SYNC
                   <ArrowUpRight size={14} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                 </button>
@@ -111,9 +111,9 @@ const TransportManagement = () => {
       {/* Satellite Management Hub */}
       <motion.div variants={itemVariants} className="glass-ultra h-[650px] w-full flex flex-col items-center justify-center relative overflow-hidden bg-slate-950/40 rounded-[3rem] border border-white/[0.02] shadow-2xl">
         <div className="absolute inset-0 opacity-[0.05] bg-[url('https://www.transparenttextures.com/patterns/grid-me-bright.png')]"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-indigo-500/10 via-transparent to-transparent flex items-center justify-center">
-           <div className="h-[600px] w-[600px] border border-indigo-500/5 rounded-full animate-[spin_60s_linear_infinite]" />
-           <div className="absolute h-[450px] w-[450px] border border-indigo-500/10 rounded-full animate-[spin_40s_linear_infinite_reverse]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-500/10 via-transparent to-transparent flex items-center justify-center">
+           <div className="h-[600px] w-[600px] border border-primary-500/5 rounded-full animate-[spin_60s_linear_infinite]" />
+           <div className="absolute h-[450px] w-[450px] border border-primary-500/10 rounded-full animate-[spin_40s_linear_infinite_reverse]" />
            <div className="absolute h-[300px] w-[300px] border border-white/5 rounded-full" />
         </div>
         
@@ -121,7 +121,7 @@ const TransportManagement = () => {
            <motion.div 
              animate={{ rotate: 360 }}
              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-             className="h-28 w-28 rounded-[2rem] bg-slate-950 border border-white/[0.04] flex items-center justify-center text-indigo-400 mb-12 shadow-[0_0_60px_rgba(99,102,241,0.2)]"
+             className="h-28 w-28 rounded-[2rem] bg-slate-950 border border-white/[0.04] flex items-center justify-center text-primary-400 mb-12 shadow-[0_0_60px_rgba(59,130,246,0.2)]"
            >
               <Navigation size={48} strokeWidth={1} />
            </motion.div>
@@ -132,7 +132,7 @@ const TransportManagement = () => {
            </p>
            
            <div className="flex flex-wrap items-center justify-center gap-6">
-              <button className="px-12 py-5 bg-indigo-500 text-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.4em] hover:bg-indigo-400 hover:shadow-[0_0_50px_rgba(99,102,241,0.4)] transition-all flex items-center gap-4 group">
+              <button className="px-12 py-5 bg-primary-500 text-white rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.4em] hover:bg-primary-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)] transition-all flex items-center gap-4 group">
                  <Zap size={20} fill="currentColor" />
                  Initiate Satellite Link
               </button>

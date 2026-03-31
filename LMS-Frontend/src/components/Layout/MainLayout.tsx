@@ -4,11 +4,11 @@ import Header from './Header'
 
 const MainLayout = () => {
   return (
-    <div className="flex min-h-screen w-full bg-[#020617] selection:bg-indigo-500/20 selection:text-indigo-200">
+    <div className="flex min-h-screen w-full bg-[#09090b] selection:bg-primary-500/20 selection:text-primary-200">
       {/* Background Atmosphere */}
       <div className="ambient-glow-tl" />
       <div className="ambient-glow-br" />
-      <div className="fixed inset-0 bg-[#020617]/40 -z-20" />
+      <div className="fixed inset-0 bg-[#09090b]/40 -z-20" />
 
       {/* Sidebar - Ultra Glossy */}
       <Sidebar />
