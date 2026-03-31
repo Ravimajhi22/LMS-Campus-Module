@@ -1,0 +1,42 @@
+{"properties": [
+  {
+    "name": "jwt.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.secret'"
+  },
+  {
+    "name": "spring.kafka.consumer.group-id",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.consumer.group-id'"
+  },
+  {
+    "name": "spring.kafka.bootstrap-servers",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.bootstrap-servers'"
+  },
+  {
+    "name": "spring.kafka.consumer.auto-offset-reset",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.consumer.auto-offset-reset'"
+  },
+  {
+    "name": "spring.kafka.consumer.properties.spring.json.trusted.packages",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.consumer.properties.spring.json.trusted.packages'"
+  }
+]}{
+    "name": "spring.kafka.producer.key-serializer",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.producer.key-serializer'"
+  }
+]}{
+    "name": "spring.kafka.consumer.properties.spring.json.trusted.packages",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.consumer.properties.spring.json.trusted.packages'"
+  }
+]}{
+    "name": "spring.kafka.producer.key-serializer",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.kafka.producer.key-serializer'"
+  }
+]}
